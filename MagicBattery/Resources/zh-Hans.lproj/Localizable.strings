@@ -1,0 +1,281 @@
+/*
+  Localizable.strings
+  MagicBattery
+
+  Created by automation.
+*/
+
+// MARK: - App Name
+"app.name" = "MagicBattery";
+
+// MARK: - Settings View
+"settings.title" = "MagicBattery";
+"settings.subtitle" = "通知、刷新和 Apple 设备发现";
+
+// Notification Section
+"settings.notification.title" = "通知设置";
+"settings.notification.subtitle" = "低电量提醒和测试通知";
+"settings.notification.enable" = "启用低电量通知";
+"settings.notification.threshold" = "低电量阈值";
+"settings.notification.threshold.description" = "当设备电量低于此值时发送通知";
+"settings.notification.test" = "发送测试通知";
+
+// Update Section
+"settings.update.title" = "刷新频率";
+"settings.update.subtitle" = "控制设备数据更新的节奏";
+"settings.update.interval" = "更新间隔";
+"settings.update.interval.description" = "设备信息的刷新频率";
+"settings.update.seconds" = "%d 秒";
+
+// BLE Section
+"settings.ble.title" = "蓝牙扫描";
+"settings.ble.subtitle" = "控制 BLE 扫描频率以节省电量";
+"settings.ble.interval" = "BLE 扫描间隔";
+"settings.ble.interval.description" = "仅在有候选设备需要补全电量时才扫描，间隔越长越省电";
+
+// Apple Devices Section
+"settings.apple_devices.title" = "Apple 设备";
+"settings.apple_devices.subtitle" = "局域网发现与 Apple Watch 读取";
+"settings.apple_devices.enable_idevice" = "启用 iPhone / iPad 发现";
+"settings.apple_devices.enable_watch" = "启用 Apple Watch 电量读取";
+"settings.apple_devices.show_offline" = "显示离线设备最近结果";
+"settings.apple_devices.iphone_note" = "iPhone / iPad 需要先通过数据线连接并信任此 Mac 一次。";
+"settings.apple_devices.watch_note" = "Apple Watch 电量通过其配对 iPhone 间接读取。";
+"settings.apple_devices.network_note" = "局域网读取依赖设备与 Mac 处于同一网络。";
+
+// App Section
+"settings.app.title" = "应用设置";
+"settings.app.subtitle" = "控制应用的系统级行为";
+"settings.app.show_in_dock" = "在 Dock 中显示";
+"settings.app.launch_at_login" = "登录时启动";
+"settings.app.launch_description" = "应用将在系统启动时自动运行";
+
+// About Section
+"settings.about.title" = "关于";
+"settings.about.subtitle" = "当前版本和功能范围";
+"settings.about.version" = "版本:";
+"settings.about.build" = "构建:";
+"settings.about.description" = "监控 Mac、蓝牙设备和已信任 Apple 设备的电池状态";
+
+// Footer
+"settings.footer.reset" = "重置为默认设置";
+"settings.footer.done" = "完成";
+
+// MARK: - Notifications
+"notification.title" = "MagicBattery";
+"notification.low_battery.subtitle" = "低电量提醒";
+"notification.low_battery.body" = "%@ 电量仅剩 %d%%，请及时充电";
+"notification.test.subtitle" = "测试通知";
+"notification.test.body" = "MagicBattery 通知功能正常";
+
+// MARK: - Device Types
+"device.type.mac" = "Mac";
+"device.type.iphone" = "iPhone";
+"device.type.ipad" = "iPad";
+"device.type.apple_watch" = "Apple Watch";
+"device.type.airpods" = "AirPods";
+"device.type.airpods_left" = "AirPods 左";
+"device.type.airpods_right" = "AirPods 右";
+"device.type.airpods_case" = "AirPods 充电盒";
+"device.type.bluetooth_keyboard" = "蓝牙键盘";
+"device.type.bluetooth_mouse" = "蓝牙鼠标";
+"device.type.bluetooth_headphone" = "蓝牙耳机";
+"device.type.bluetooth_device" = "蓝牙设备";
+
+// MARK: - Device Source
+"device.source.bluetooth" = "蓝牙";
+"device.source.usb" = "USB";
+"device.source.network" = "网络";
+"device.source.via_iphone" = "经 iPhone";
+
+// MARK: - Device Status
+"device.status.charging" = "充电中";
+"device.status.offline" = "已离线";
+"device.status.unknown_battery" = "电量未知";
+
+// MARK: - Permissions
+"permission.notification.title" = "通知";
+"permission.notification.description" = "用于发送低电量提醒";
+"permission.bluetooth.title" = "蓝牙";
+"permission.bluetooth.description" = "用于监控蓝牙设备电量";
+"permission.accessibility.title" = "辅助功能";
+"permission.accessibility.description" = "用于增强功能（可选）";
+
+"permission.status.granted" = "已授权";
+"permission.status.denied" = "已拒绝";
+"permission.status.not_determined" = "未确定";
+
+// MARK: - Errors
+"error.battery_info_failed" = "获取电池信息失败";
+"error.notification_failed" = "发送通知失败";
+"error.permission_failed" = "请求权限失败";
+"error.device_refresh_failed" = "刷新设备失败";
+
+// MARK: - Common
+"common.ok" = "好";
+"common.cancel" = "取消";
+"common.close" = "关闭";
+"common.save" = "保存";
+"common.reset" = "重置";
+"common.unknown" = "未知";
+"common.yes" = "是";
+"common.no" = "否";
+
+// MARK: - Permission Request View
+"permission.welcome.title" = "欢迎使用 MagicBattery";
+"permission.welcome.subtitle" = "为了正常使用，应用需要以下权限";
+"permission.checking" = "正在检查权限...";
+"permission.start" = "开始使用";
+"permission.grant_all" = "授予权限";
+"permission.later" = "稍后设置";
+"permission.modify_hint" = "您可以随时在设置中修改权限";
+"permission.required" = "必需";
+"permission.open_settings" = "打开设置";
+"permission.authorize" = "授权";
+
+// MARK: - Popover View
+"popover.low_battery_count" = "%d 个低电量";
+"popover.devices_online" = "%d 台设备在线";
+"popover.loading" = "正在加载设备...";
+"popover.empty.title" = "未发现设备";
+"popover.empty.subtitle" = "请确保蓝牙设备已连接，或通过数据线信任 iPhone/iPad";
+"popover.settings" = "设置";
+"popover.quit" = "退出";
+"popover.waiting" = "等待设备";
+"popover.refresh_help" = "刷新设备列表";
+
+// MARK: - Menu Bar
+"menubar.tooltip_charging" = "%@: %d%% (充电中)";
+"menubar.tooltip" = "%@: %d%%";
+"menubar.battery" = "电池";
+
+// MARK: - Device Row
+"device.context.set_keyboard" = "设为键盘";
+"device.context.set_mouse" = "设为鼠标";
+"device.context.clear_override" = "清除类型覆盖";
+
+// MARK: - Device Details
+"details.refresh_help" = "刷新详情";
+"details.loading" = "正在读取电池详情...";
+"details.unavailable" = "详情暂不可用";
+"details.retry_hint" = "请确认设备在线后再试一次。";
+"details.offline_hint" = "当前设备处于离线状态，详情可能无法刷新。";
+"details.default_subtitle" = "设备电池详情";
+
+// MARK: - Sort & Group
+"sort.ascending" = "正序";
+"sort.descending" = "倒序";
+"sort.by_battery" = "按电量";
+"sort.by_name" = "按名称";
+"sort.by_updated" = "按更新时间";
+"sort.by_type" = "按设备类型";
+"sort.toggle_help" = "切换排序方向";
+"group.local" = "本机";
+"group.apple_devices" = "苹果设备";
+"group.accessories" = "外设";
+"filter.all" = "全部设备";
+"filter.low_battery" = "低电量";
+"filter.charging" = "充电中";
+
+// MARK: - Settings Formats
+"settings.seconds_format" = "%d 秒";
+
+// MARK: - Device Details Errors
+"error.unsupported_device" = "%@ 暂不支持详情查看";
+"error.missing_identifier" = "缺少设备标识，无法读取详情";
+"error.no_details" = "暂时没有可显示的电池详情";
+"error.plist_parse" = "电池诊断输出解析失败";
+"error.mac_battery_unavailable" = "无法读取 Mac 本机电池详情";
+"error.tool_unavailable" = "%@ 不可用";
+
+// MARK: - Battery Detail Labels
+"detail.level" = "电量";
+"detail.charging" = "充电中";
+"detail.external_connected" = "已接外部电源";
+"detail.charge_capable" = "可外部充电";
+"detail.fully_charged" = "已充满";
+"detail.has_battery" = "检测到电池";
+"detail.cycle_count" = "循环次数";
+"detail.health_estimate" = "估算健康度";
+"detail.health_estimate_note" = "按标称容量 / 设计容量估算";
+"detail.design_capacity" = "设计容量";
+"detail.nominal_capacity" = "标称容量";
+"detail.raw_current_capacity" = "当前原始容量";
+"detail.true_remaining" = "真实剩余容量";
+"detail.absolute_capacity" = "绝对容量";
+"detail.battery_serial" = "电池序列号";
+"detail.voltage" = "电压";
+"detail.raw_voltage" = "原始电压";
+"detail.instant_amperage" = "瞬时电流";
+"detail.average_amperage" = "平均电流";
+"detail.temperature" = "温度";
+"detail.virtual_temperature" = "虚拟温度";
+"detail.battery_power" = "电池功率";
+"detail.health_metric" = "健康指标";
+"detail.health_metric_note" = "原始值";
+"detail.charging_current" = "充电电流";
+"detail.charging_voltage" = "充电电压";
+"detail.adapter_voltage" = "适配器电压";
+"detail.adapter_current" = "适配器电流";
+"detail.time_remaining" = "预计剩余时间";
+"detail.time_to_full" = "预计充满时间";
+"detail.not_charging_reason" = "未充电原因";
+"detail.device_name" = "设备名称";
+"detail.product_type" = "产品型号";
+"detail.hardware_model" = "硬件型号";
+"detail.system_version" = "系统版本";
+"detail.build_version" = "构建版本";
+"detail.serial_number" = "设备序列号";
+"detail.connection" = "连接方式";
+"detail.identifier" = "设备标识";
+"detail.last_updated" = "列表更新时间";
+"detail.power_source" = "当前电源";
+"detail.battery_present" = "电池存在";
+"detail.design_cycle_limit" = "设计循环上限";
+"detail.adapter_type" = "适配器类型";
+"detail.adapter_power" = "适配器功率";
+"detail.wireless_charging" = "无线充电";
+"detail.device_source" = "设备来源";
+"detail.source_iphone" = "来源 iPhone";
+"detail.paired_udid" = "配对手机 UDID";
+
+// MARK: - Battery Detail Sections
+"section.current_status" = "当前状态";
+"section.capacity" = "容量与寿命";
+"section.telemetry" = "电气与温度";
+"section.charger" = "充电与供电";
+"section.adapter" = "适配器";
+"section.device_info" = "设备信息";
+
+// MARK: - Battery Detail Footnotes
+"footnote.idevice" = "iPhone / iPad 详情来自 libimobiledevice diagnostics 与 AppleSmartBattery。";
+"footnote.watch" = "Apple Watch 详情当前通过 iPhone companion_proxy 间接读取。";
+"footnote.watch_unsupported" = "以下字段当前不支持读取：%@";
+"footnote.mac" = "Mac 详情来自 IOPowerSources 与 AppleSmartBattery。";
+"footnote.gasgauge_unavailable" = "GasGauge 诊断不可用";
+"footnote.smartbattery_unavailable" = "AppleSmartBattery 诊断不可用";
+
+// MARK: - Power Source & Duration
+"power.ac" = "交流电";
+"power.battery" = "电池";
+"detail.local" = "本机";
+"detail.subtitle_mac" = "本机电池详情";
+"duration.hours_minutes" = "%d 小时 %d 分钟";
+"duration.minutes" = "%d 分钟";
+
+// MARK: - Internal Error Messages
+"error.tool_not_found" = "未找到工具: %@; candidates=%@";
+"error.execution_failed" = "%@ 执行失败，退出码 %d";
+"error.execution_failed_detail" = "%@ 执行失败，退出码 %d: %@";
+"error.timed_out" = "%@ 执行超时 (%ds)";
+"error.launch_failed" = "%@ 启动失败: %@";
+"error.power_source_unavailable" = "无法获取电源信息";
+"error.no_power_source" = "未找到电源设备";
+"error.no_internal_battery" = "未找到内置电池";
+"error.device_address_unavailable" = "无法获取设备地址";
+
+// MARK: - Misc
+"device.unknown_name" = "未知设备";
+"device.bluetooth_device_fallback" = "蓝牙设备";
+"device.stale_detail" = "显示最近一次结果";
+"widget.description" = "显示所有设备的电池状态";

@@ -1,0 +1,281 @@
+/*
+  Localizable.strings
+  MagicBattery
+
+  Created by automation.
+*/
+
+// MARK: - App Name
+"app.name" = "MagicBattery";
+
+// MARK: - Settings View
+"settings.title" = "MagicBattery";
+"settings.subtitle" = "Notifications, Refresh & Apple Device Discovery";
+
+// Notification Section
+"settings.notification.title" = "Notifications";
+"settings.notification.subtitle" = "Low battery alerts and test notifications";
+"settings.notification.enable" = "Enable Low Battery Notifications";
+"settings.notification.threshold" = "Low Battery Threshold";
+"settings.notification.threshold.description" = "Send notification when device battery falls below this level";
+"settings.notification.test" = "Send Test Notification";
+
+// Update Section
+"settings.update.title" = "Refresh Rate";
+"settings.update.subtitle" = "Control device data update frequency";
+"settings.update.interval" = "Update Interval";
+"settings.update.interval.description" = "Device information refresh frequency";
+"settings.update.seconds" = "%d seconds";
+
+// BLE Section
+"settings.ble.title" = "Bluetooth Scanning";
+"settings.ble.subtitle" = "Control BLE scan frequency to save battery";
+"settings.ble.interval" = "BLE Scan Interval";
+"settings.ble.interval.description" = "Only scans when candidate devices need battery info, longer interval saves more power";
+
+// Apple Devices Section
+"settings.apple_devices.title" = "Apple Devices";
+"settings.apple_devices.subtitle" = "Local network discovery & Apple Watch reading";
+"settings.apple_devices.enable_idevice" = "Enable iPhone / iPad Discovery";
+"settings.apple_devices.enable_watch" = "Enable Apple Watch Battery Reading";
+"settings.apple_devices.show_offline" = "Show Recent Results for Offline Devices";
+"settings.apple_devices.iphone_note" = "iPhone / iPad must be connected via cable and trusted once.";
+"settings.apple_devices.watch_note" = "Apple Watch battery is read indirectly through paired iPhone.";
+"settings.apple_devices.network_note" = "Local network reading requires devices on the same network as Mac.";
+
+// App Section
+"settings.app.title" = "App Settings";
+"settings.app.subtitle" = "Control system-level app behavior";
+"settings.app.show_in_dock" = "Show in Dock";
+"settings.app.launch_at_login" = "Launch at Login";
+"settings.app.launch_description" = "App will launch automatically at system startup";
+
+// About Section
+"settings.about.title" = "About";
+"settings.about.subtitle" = "Current version and feature scope";
+"settings.about.version" = "Version:";
+"settings.about.build" = "Build:";
+"settings.about.description" = "Monitor battery status of Mac, Bluetooth devices, and trusted Apple devices";
+
+// Footer
+"settings.footer.reset" = "Reset to Defaults";
+"settings.footer.done" = "Done";
+
+// MARK: - Notifications
+"notification.title" = "MagicBattery";
+"notification.low_battery.subtitle" = "Low Battery Alert";
+"notification.low_battery.body" = "%@ battery is at %d%%, please charge soon";
+"notification.test.subtitle" = "Test Notification";
+"notification.test.body" = "MagicBattery notification is working";
+
+// MARK: - Device Types
+"device.type.mac" = "Mac";
+"device.type.iphone" = "iPhone";
+"device.type.ipad" = "iPad";
+"device.type.apple_watch" = "Apple Watch";
+"device.type.airpods" = "AirPods";
+"device.type.airpods_left" = "AirPods Left";
+"device.type.airpods_right" = "AirPods Right";
+"device.type.airpods_case" = "AirPods Case";
+"device.type.bluetooth_keyboard" = "Bluetooth Keyboard";
+"device.type.bluetooth_mouse" = "Bluetooth Mouse";
+"device.type.bluetooth_headphone" = "Bluetooth Headphones";
+"device.type.bluetooth_device" = "Bluetooth Device";
+
+// MARK: - Device Source
+"device.source.bluetooth" = "Bluetooth";
+"device.source.usb" = "USB";
+"device.source.network" = "Network";
+"device.source.via_iphone" = "via iPhone";
+
+// MARK: - Device Status
+"device.status.charging" = "Charging";
+"device.status.offline" = "Offline";
+"device.status.unknown_battery" = "Unknown Battery";
+
+// MARK: - Permissions
+"permission.notification.title" = "Notifications";
+"permission.notification.description" = "For sending low battery alerts";
+"permission.bluetooth.title" = "Bluetooth";
+"permission.bluetooth.description" = "For monitoring Bluetooth device battery";
+"permission.accessibility.title" = "Accessibility";
+"permission.accessibility.description" = "For enhanced features (optional)";
+
+"permission.status.granted" = "Granted";
+"permission.status.denied" = "Denied";
+"permission.status.not_determined" = "Not Determined";
+
+// MARK: - Errors
+"error.battery_info_failed" = "Failed to get battery info";
+"error.notification_failed" = "Failed to send notification";
+"error.permission_failed" = "Failed to request permission";
+"error.device_refresh_failed" = "Failed to refresh devices";
+
+// MARK: - Common
+"common.ok" = "OK";
+"common.cancel" = "Cancel";
+"common.close" = "Close";
+"common.save" = "Save";
+"common.reset" = "Reset";
+"common.unknown" = "Unknown";
+"common.yes" = "Yes";
+"common.no" = "No";
+
+// MARK: - Permission Request View
+"permission.welcome.title" = "Welcome to MagicBattery";
+"permission.welcome.subtitle" = "The app needs the following permissions to work properly";
+"permission.checking" = "Checking permissions...";
+"permission.start" = "Get Started";
+"permission.grant_all" = "Grant Permissions";
+"permission.later" = "Set Up Later";
+"permission.modify_hint" = "You can modify permissions anytime in Settings";
+"permission.required" = "Required";
+"permission.open_settings" = "Open Settings";
+"permission.authorize" = "Authorize";
+
+// MARK: - Popover View
+"popover.low_battery_count" = "%d low battery";
+"popover.devices_online" = "%d devices online";
+"popover.loading" = "Loading devices...";
+"popover.empty.title" = "No devices found";
+"popover.empty.subtitle" = "Ensure Bluetooth devices are connected, or trust iPhone/iPad via cable once";
+"popover.settings" = "Settings";
+"popover.quit" = "Quit";
+"popover.waiting" = "Waiting for devices";
+"popover.refresh_help" = "Refresh device list";
+
+// MARK: - Menu Bar
+"menubar.tooltip_charging" = "%@: %d%% (Charging)";
+"menubar.tooltip" = "%@: %d%%";
+"menubar.battery" = "Battery";
+
+// MARK: - Device Row
+"device.context.set_keyboard" = "Set as Keyboard";
+"device.context.set_mouse" = "Set as Mouse";
+"device.context.clear_override" = "Clear Type Override";
+
+// MARK: - Device Details
+"details.refresh_help" = "Refresh details";
+"details.loading" = "Reading battery details...";
+"details.unavailable" = "Details unavailable";
+"details.retry_hint" = "Please confirm the device is online and try again.";
+"details.offline_hint" = "Device is offline, details may not refresh.";
+"details.default_subtitle" = "Device Battery Details";
+
+// MARK: - Sort & Group
+"sort.ascending" = "Ascending";
+"sort.descending" = "Descending";
+"sort.by_battery" = "By Battery";
+"sort.by_name" = "By Name";
+"sort.by_updated" = "By Updated";
+"sort.by_type" = "By Type";
+"sort.toggle_help" = "Toggle sort order";
+"group.local" = "This Mac";
+"group.apple_devices" = "Apple Devices";
+"group.accessories" = "Accessories";
+"filter.all" = "All Devices";
+"filter.low_battery" = "Low Battery";
+"filter.charging" = "Charging";
+
+// MARK: - Settings Formats
+"settings.seconds_format" = "%d sec";
+
+// MARK: - Device Details Errors
+"error.unsupported_device" = "%@ does not support detail view";
+"error.missing_identifier" = "Missing device identifier, unable to read details";
+"error.no_details" = "No battery details available";
+"error.plist_parse" = "Battery diagnostics output parsing failed";
+"error.mac_battery_unavailable" = "Unable to read Mac battery details";
+"error.tool_unavailable" = "%@ is unavailable";
+
+// MARK: - Battery Detail Labels
+"detail.level" = "Battery Level";
+"detail.charging" = "Charging";
+"detail.external_connected" = "External Power Connected";
+"detail.charge_capable" = "External Charge Capable";
+"detail.fully_charged" = "Fully Charged";
+"detail.has_battery" = "Battery Detected";
+"detail.cycle_count" = "Cycle Count";
+"detail.health_estimate" = "Estimated Health";
+"detail.health_estimate_note" = "Based on nominal / design capacity";
+"detail.design_capacity" = "Design Capacity";
+"detail.nominal_capacity" = "Nominal Capacity";
+"detail.raw_current_capacity" = "Raw Current Capacity";
+"detail.true_remaining" = "True Remaining Capacity";
+"detail.absolute_capacity" = "Absolute Capacity";
+"detail.battery_serial" = "Battery Serial Number";
+"detail.voltage" = "Voltage";
+"detail.raw_voltage" = "Raw Voltage";
+"detail.instant_amperage" = "Instant Amperage";
+"detail.average_amperage" = "Average Amperage";
+"detail.temperature" = "Temperature";
+"detail.virtual_temperature" = "Virtual Temperature";
+"detail.battery_power" = "Battery Power";
+"detail.health_metric" = "Health Metric";
+"detail.health_metric_note" = "Raw value";
+"detail.charging_current" = "Charging Current";
+"detail.charging_voltage" = "Charging Voltage";
+"detail.adapter_voltage" = "Adapter Voltage";
+"detail.adapter_current" = "Adapter Current";
+"detail.time_remaining" = "Est. Time Remaining";
+"detail.time_to_full" = "Est. Time to Full";
+"detail.not_charging_reason" = "Not Charging Reason";
+"detail.device_name" = "Device Name";
+"detail.product_type" = "Product Type";
+"detail.hardware_model" = "Hardware Model";
+"detail.system_version" = "System Version";
+"detail.build_version" = "Build Version";
+"detail.serial_number" = "Serial Number";
+"detail.connection" = "Connection";
+"detail.identifier" = "Device Identifier";
+"detail.last_updated" = "Last Updated";
+"detail.power_source" = "Power Source";
+"detail.battery_present" = "Battery Present";
+"detail.design_cycle_limit" = "Design Cycle Limit";
+"detail.adapter_type" = "Adapter Type";
+"detail.adapter_power" = "Adapter Power";
+"detail.wireless_charging" = "Wireless Charging";
+"detail.device_source" = "Device Source";
+"detail.source_iphone" = "Source iPhone";
+"detail.paired_udid" = "Paired Phone UDID";
+
+// MARK: - Battery Detail Sections
+"section.current_status" = "Current Status";
+"section.capacity" = "Capacity & Lifespan";
+"section.telemetry" = "Electrical & Temperature";
+"section.charger" = "Charging & Power";
+"section.adapter" = "Adapter";
+"section.device_info" = "Device Info";
+
+// MARK: - Battery Detail Footnotes
+"footnote.idevice" = "iPhone / iPad details from libimobiledevice diagnostics & AppleSmartBattery.";
+"footnote.watch" = "Apple Watch details read indirectly via iPhone companion_proxy.";
+"footnote.watch_unsupported" = "The following fields are currently unsupported: %@";
+"footnote.mac" = "Mac details from IOPowerSources & AppleSmartBattery.";
+"footnote.gasgauge_unavailable" = "GasGauge diagnostics unavailable";
+"footnote.smartbattery_unavailable" = "AppleSmartBattery diagnostics unavailable";
+
+// MARK: - Power Source & Duration
+"power.ac" = "AC Power";
+"power.battery" = "Battery";
+"detail.local" = "Local";
+"detail.subtitle_mac" = "Local Battery Details";
+"duration.hours_minutes" = "%d hr %d min";
+"duration.minutes" = "%d min";
+
+// MARK: - Internal Error Messages
+"error.tool_not_found" = "Tool not found: %@; candidates=%@";
+"error.execution_failed" = "%@ execution failed, exit code %d";
+"error.execution_failed_detail" = "%@ execution failed, exit code %d: %@";
+"error.timed_out" = "%@ execution timed out (%ds)";
+"error.launch_failed" = "%@ failed to launch: %@";
+"error.power_source_unavailable" = "Unable to get power source info";
+"error.no_power_source" = "No power source device found";
+"error.no_internal_battery" = "No internal battery found";
+"error.device_address_unavailable" = "Unable to get device address";
+
+// MARK: - Misc
+"device.unknown_name" = "Unknown Device";
+"device.bluetooth_device_fallback" = "Bluetooth Device";
+"device.stale_detail" = "Showing last result";
+"widget.description" = "Display battery status of all devices";

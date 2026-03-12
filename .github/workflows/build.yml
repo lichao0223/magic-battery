@@ -1,0 +1,189 @@
+name: Build MagicBattery
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    strategy:
+      matrix:
+        arch:
+          - name: intel
+            xcode_arch: x86_64
+          - name: apple-silicon
+            xcode_arch: arm64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode 26
+      run: |
+        ls /Applications/ | grep Xcode
+        sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+        xcodebuild -version
+        xcrun --show-sdk-path
+
+    - name: Get version
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/v* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          # 从 Xcode 项目读取 MARKETING_VERSION
+          XCODE_VERSION=$(grep -m 1 'MARKETING_VERSION' battery.xcodeproj/project.pbxproj | sed 's/.*= \(.*\);/\1/')
+          VERSION="${XCODE_VERSION}-dev-$(git rev-parse --short HEAD)"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+
+    - name: Run tests
+      timeout-minutes: 10
+      run: |
+        xcodebuild test \
+          -project battery.xcodeproj \
+          -scheme battery \
+          -configuration Debug \
+          -destination 'platform=macOS' \
+          -parallel-testing-enabled NO \
+          -retry-tests-on-failure \
+          -test-repetition-relaunch-enabled YES \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Build app
+      run: |
+        xcodebuild clean build \
+          -project battery.xcodeproj \
+          -scheme battery \
+          -configuration Release \
+          -derivedDataPath build \
+          -arch ${{ matrix.arch.xcode_arch }} \
+          ONLY_ACTIVE_ARCH=NO \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          MARKETING_VERSION="${{ steps.version.outputs.version }}"
+
+    - name: Sign app and binaries
+      if: startsWith(github.ref, 'refs/tags/v') && env.DEVELOPER_ID_CERTIFICATE != ''
+      env:
+        DEVELOPER_ID_CERTIFICATE: ${{ secrets.DEVELOPER_ID_CERTIFICATE }}
+        DEVELOPER_ID_PASSWORD: ${{ secrets.DEVELOPER_ID_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      run: |
+        APP_PATH="build/Build/Products/Release/MagicBattery.app"
+        IDENTITY="Developer ID Application"
+
+        # Import certificate
+        echo "$DEVELOPER_ID_CERTIFICATE" | base64 --decode > cert.p12
+        security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        security import cert.p12 -k build.keychain -P "$DEVELOPER_ID_PASSWORD" -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+        rm cert.p12
+
+        # Sign all dylibs and executables in Vendor
+        find "$APP_PATH/Contents/Resources/Vendor" -type f \( -name "*.dylib" -o -perm +111 \) | while read binary; do
+          codesign --force --options runtime --sign "$IDENTITY" "$binary"
+        done
+
+        # Sign the app bundle
+        codesign --force --deep --options runtime --sign "$IDENTITY" "$APP_PATH"
+
+        # Verify signature
+        codesign --verify --deep --strict "$APP_PATH"
+
+    - name: Notarize app
+      if: startsWith(github.ref, 'refs/tags/v') && env.APPLE_API_KEY != ''
+      env:
+        APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+        APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+      run: |
+        APP_PATH="build/Build/Products/Release/MagicBattery.app"
+
+        # Create zip for notarization
+        ditto -c -k --keepParent "$APP_PATH" MagicBattery.zip
+
+        # Write API key
+        mkdir -p ~/private_keys
+        echo "$APPLE_API_KEY" | base64 --decode > ~/private_keys/AuthKey_${APPLE_API_KEY_ID}.p8
+
+        # Submit for notarization
+        xcrun notarytool submit MagicBattery.zip \
+          --key ~/private_keys/AuthKey_${APPLE_API_KEY_ID}.p8 \
+          --key-id "$APPLE_API_KEY_ID" \
+          --issuer "$APPLE_API_ISSUER" \
+          --wait
+
+        # Staple the app
+        xcrun stapler staple "$APP_PATH"
+
+        # Cleanup
+        rm MagicBattery.zip
+        rm -rf ~/private_keys
+
+    - name: Install create-dmg
+      run: brew install create-dmg
+
+    - name: Create DMG
+      run: |
+        DMG_NAME="MagicBattery-${{ steps.version.outputs.version }}-${{ matrix.arch.name }}.dmg"
+
+        # create-dmg 返回非零退出码当跳过某些可选步骤时，用 || true 忽略
+        create-dmg \
+          --volname "MagicBattery ${{ steps.version.outputs.version }}" \
+          --window-pos 200 120 \
+          --window-size 660 400 \
+          --icon-size 100 \
+          --icon "MagicBattery.app" 160 185 \
+          --app-drop-link 500 185 \
+          --no-internet-enable \
+          "$DMG_NAME" \
+          build/Build/Products/Release/MagicBattery.app \
+          || true
+
+        # 验证 DMG 已生成
+        test -f "$DMG_NAME" || { echo "DMG creation failed"; exit 1; }
+
+        echo "dmg_name=$DMG_NAME" >> $GITHUB_ENV
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MagicBattery-${{ steps.version.outputs.version }}-${{ matrix.arch.name }}
+        path: ${{ env.dmg_name }}
+        retention-days: 30
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ env.dmg_name }}
+        draft: false
+        prerelease: false
+        body: |
+          ## MagicBattery ${{ steps.version.outputs.version }}
+
+          ### Downloads
+          - Intel (x86_64): `MagicBattery-${{ steps.version.outputs.version }}-intel.dmg`
+          - Apple Silicon (arm64): `MagicBattery-${{ steps.version.outputs.version }}-apple-silicon.dmg`
+
+          ### Installation
+          1. Download the DMG file matching your Mac's chip type
+          2. Open the DMG and drag MagicBattery.app to the Applications folder
+          3. If unsigned: right-click → Open for first launch
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
