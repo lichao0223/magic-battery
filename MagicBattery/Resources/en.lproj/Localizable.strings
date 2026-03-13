@@ -71,6 +71,8 @@
 "notification.low_battery.body" = "%@ battery is at %d%%, please charge soon";
 "notification.test.subtitle" = "Test Notification";
 "notification.test.body" = "MagicBattery notification is working";
+"settings.notification.test.permission_denied" = "Notification permission denied. Please enable notifications in System Settings.";
+"settings.notification.test.failed" = "Failed to send notification";
 
 // MARK: - Device Types
 "device.type.mac" = "Mac";
@@ -258,6 +260,13 @@
 "footnote.mac" = "Mac details from IOPowerSources & AppleSmartBattery.";
 "footnote.gasgauge_unavailable" = "GasGauge diagnostics unavailable";
 "footnote.smartbattery_unavailable" = "AppleSmartBattery diagnostics unavailable";
+
+// MARK: - Adapter Types
+"adapter.pd_charger" = "PD Charger";
+"adapter.usb_host" = "USB Host";
+"adapter.usb_charger" = "USB Charger";
+"adapter.magsafe" = "MagSafe";
+"adapter.wireless" = "Wireless";
 
 // MARK: - Power Source & Duration
 "power.ac" = "AC Power";

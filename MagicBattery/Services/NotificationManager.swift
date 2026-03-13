@@ -123,8 +123,21 @@ final class NotificationManager: NSObject {
         notificationCenter.removeAllDeliveredNotifications()
     }
 
+    /// 发送测试通知的结果
+    enum TestNotificationResult {
+        case success
+        case permissionDenied
+        case failed(String)
+    }
+
     /// 发送测试通知
-    func sendTestNotification() async {
+    func sendTestNotification() async -> TestNotificationResult {
+        let status = await notificationCenter.notificationSettings().authorizationStatus
+        guard status == .authorized else {
+            AppLogger.warning("通知权限未授予，无法发送测试通知", category: AppLogger.notification)
+            return .permissionDenied
+        }
+
         let content = UNMutableNotificationContent()
         content.title = String(localized: "notification.title")
         content.subtitle = String(localized: "notification.test.subtitle")
@@ -139,8 +152,10 @@ final class NotificationManager: NSObject {
 
         do {
             try await notificationCenter.add(request)
+            return .success
         } catch {
             AppLogger.error("发送测试通知失败: \(error.localizedDescription)", category: AppLogger.notification)
+            return .failed(error.localizedDescription)
         }
     }
 
