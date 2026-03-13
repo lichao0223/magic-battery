@@ -271,7 +271,7 @@ final class DeviceDetailsService {
         ])
 
         let adapterItems = compactItems([
-            metricItem(id: "mac_adapter_description", title: String(localized: "detail.adapter_type"), value: stringValue(forKey: "Description", in: adapterDetails)),
+            metricItem(id: "mac_adapter_description", title: String(localized: "detail.adapter_type"), value: localizedAdapterType(stringValue(forKey: "Description", in: adapterDetails))),
             metricItem(id: "mac_adapter_watts", title: String(localized: "detail.adapter_power"), value: powerString(intValue(forKey: "Watts", in: adapterDetails))),
             metricItem(id: "mac_adapter_voltage", title: String(localized: "detail.adapter_voltage"), value: measurementString(intValue(forKey: "AdapterVoltage", in: adapterDetails), unit: "mV")),
             metricItem(id: "mac_adapter_current", title: String(localized: "detail.adapter_current"), value: measurementString(intValue(forKey: "Current", in: adapterDetails), unit: "mA")),
@@ -482,6 +482,24 @@ final class DeviceDetailsService {
 
     private func boolValue(forKey key: String, in dictionary: [String: String]) -> Bool? {
         parseBool(dictionary[key])
+    }
+
+    private func localizedAdapterType(_ raw: String?) -> String? {
+        guard let raw else { return nil }
+        switch raw.lowercased() {
+        case "pd charger":
+            return String(localized: "adapter.pd_charger")
+        case "usb host":
+            return String(localized: "adapter.usb_host")
+        case "usb charger":
+            return String(localized: "adapter.usb_charger")
+        case "magsafe":
+            return String(localized: "adapter.magsafe")
+        case "wireless":
+            return String(localized: "adapter.wireless")
+        default:
+            return raw
+        }
     }
 
     private func boolString(_ value: Bool?) -> String? {
