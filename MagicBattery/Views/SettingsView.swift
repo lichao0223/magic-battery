@@ -14,6 +14,7 @@ struct SettingsView: View {
     @AppStorage("appearanceMode") private var appearanceMode = 0
 
     @Environment(\.dismiss) private var dismiss
+    @State private var testNotificationMessage: String?
 
     private var appShortVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
@@ -148,13 +149,28 @@ struct SettingsView: View {
             }
 
             Button(action: {
+                testNotificationMessage = nil
                 Task {
-                    await NotificationManager.shared.sendTestNotification()
+                    let result = await NotificationManager.shared.sendTestNotification()
+                    switch result {
+                    case .success:
+                        testNotificationMessage = nil
+                    case .permissionDenied:
+                        testNotificationMessage = String(localized: "settings.notification.test.permission_denied")
+                    case .failed(let error):
+                        testNotificationMessage = String(localized: "settings.notification.test.failed") + ": " + error
+                    }
                 }
             }) {
                 Label("settings.notification.test", systemImage: "bell.badge")
             }
             .batterySecondaryControlStyle()
+
+            if let testNotificationMessage {
+                Text(testNotificationMessage)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.orange)
+            }
         }
     }
 
