@@ -47,7 +47,7 @@ extension View {
 
     func batteryToolbarChip(
         tint: Color = Color.white.opacity(0.76),
-        foreground: Color = Color.black.opacity(0.74)
+        foreground: Color = Color.primary.opacity(0.85)
     ) -> some View {
         modifier(BatteryToolbarChipModifier(tint: tint, foreground: foreground))
     }

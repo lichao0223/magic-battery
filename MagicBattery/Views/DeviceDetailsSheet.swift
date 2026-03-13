@@ -5,7 +5,16 @@ struct DeviceDetailsSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @AppStorage("appearanceMode") private var appearanceMode = 0
     @StateObject private var viewModel: DeviceDetailsViewModel
+
+    private var resolvedColorScheme: ColorScheme? {
+        switch appearanceMode {
+        case 1: return .light
+        case 2: return .dark
+        default: return nil
+        }
+    }
 
     init(device: Device) {
         self.device = device
@@ -23,6 +32,7 @@ struct DeviceDetailsSheet: View {
             }
         }
         .frame(width: 456, height: 620, alignment: .top)
+        .preferredColorScheme(resolvedColorScheme)
         .padding(10)
         .background(BatteryAtmosphereBackground())
         .batteryPanelSurface(cornerRadius: 30, tint: Color.white.opacity(0.08))
