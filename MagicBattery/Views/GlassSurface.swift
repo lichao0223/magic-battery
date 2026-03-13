@@ -25,60 +25,12 @@ extension View {
         }
     }
 
-    @ViewBuilder
     func batteryCardSurface(cornerRadius: CGFloat = 18, tint: Color? = nil) -> some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-
-        if #available(macOS 26.0, *) {
-            self
-                .background {
-                    shape
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.97),
-                                    Color(red: 0.94, green: 0.97, blue: 0.99).opacity(0.90)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .overlay(
-                            shape.stroke(Color.white.opacity(0.88), lineWidth: 1)
-                        )
-                        .shadow(color: .black.opacity(0.08), radius: 12, y: 6)
-                }
-        } else {
-            self
-                .background(.ultraThinMaterial, in: shape)
-                .overlay(
-                    shape.stroke(Color.white.opacity(0.18), lineWidth: 0.8)
-                )
-        }
+        modifier(BatteryCardSurfaceModifier(cornerRadius: cornerRadius, tint: tint))
     }
 
-    @ViewBuilder
     func batterySectionSurface(cornerRadius: CGFloat = 22) -> some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-
-        self
-            .background {
-                shape
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.76),
-                                Color.white.opacity(0.58)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        shape.stroke(Color.white.opacity(0.64), lineWidth: 1)
-                    )
-                    .shadow(color: .black.opacity(0.05), radius: 10, y: 5)
-            }
+        modifier(BatterySectionSurfaceModifier(cornerRadius: cornerRadius))
     }
 
     func batterySecondaryControlStyle(compact: Bool = false) -> some View {
@@ -101,33 +53,138 @@ extension View {
     }
 }
 
+// MARK: - BatteryCardSurfaceModifier
+
+private struct BatteryCardSurfaceModifier: ViewModifier {
+    let cornerRadius: CGFloat
+    let tint: Color?
+    @Environment(\.colorScheme) private var colorScheme
+
+    func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let isDark = colorScheme == .dark
+
+        if #available(macOS 26.0, *) {
+            content
+                .background {
+                    shape
+                        .fill(
+                            LinearGradient(
+                                colors: isDark
+                                    ? [
+                                        Color.white.opacity(0.08),
+                                        Color.white.opacity(0.05)
+                                    ]
+                                    : [
+                                        Color.white.opacity(0.97),
+                                        Color(red: 0.94, green: 0.97, blue: 0.99).opacity(0.90)
+                                    ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .overlay(
+                            shape.stroke(
+                                Color.white.opacity(isDark ? 0.12 : 0.88),
+                                lineWidth: 1
+                            )
+                        )
+                        .shadow(
+                            color: isDark ? .clear : .black.opacity(0.08),
+                            radius: 12, y: 6
+                        )
+                }
+        } else {
+            content
+                .background(.ultraThinMaterial, in: shape)
+                .overlay(
+                    shape.stroke(Color.white.opacity(0.18), lineWidth: 0.8)
+                )
+        }
+    }
+}
+
+// MARK: - BatterySectionSurfaceModifier
+
+private struct BatterySectionSurfaceModifier: ViewModifier {
+    let cornerRadius: CGFloat
+    @Environment(\.colorScheme) private var colorScheme
+
+    func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let isDark = colorScheme == .dark
+
+        content
+            .background {
+                shape
+                    .fill(
+                        LinearGradient(
+                            colors: isDark
+                                ? [
+                                    Color.white.opacity(0.10),
+                                    Color.white.opacity(0.06)
+                                ]
+                                : [
+                                    Color.white.opacity(0.76),
+                                    Color.white.opacity(0.58)
+                                ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(
+                        shape.stroke(
+                            Color.white.opacity(isDark ? 0.10 : 0.64),
+                            lineWidth: 1
+                        )
+                    )
+                    .shadow(
+                        color: isDark ? .clear : .black.opacity(0.05),
+                        radius: 10, y: 5
+                    )
+            }
+    }
+}
+
+// MARK: - BatteryAtmosphereBackground
+
 struct BatteryAtmosphereBackground: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
+        let isDark = colorScheme == .dark
+
         ZStack {
             LinearGradient(
-                colors: [
-                    Color(red: 0.80, green: 0.88, blue: 0.97),
-                    Color(red: 0.90, green: 0.95, blue: 0.88),
-                    Color(red: 0.83, green: 0.91, blue: 0.94)
-                ],
+                colors: isDark
+                    ? [
+                        Color(red: 0.08, green: 0.10, blue: 0.16),
+                        Color(red: 0.10, green: 0.14, blue: 0.18),
+                        Color(red: 0.08, green: 0.12, blue: 0.15)
+                    ]
+                    : [
+                        Color(red: 0.80, green: 0.88, blue: 0.97),
+                        Color(red: 0.90, green: 0.95, blue: 0.88),
+                        Color(red: 0.83, green: 0.91, blue: 0.94)
+                    ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
             Circle()
-                .fill(Color.white.opacity(0.55))
+                .fill(Color.white.opacity(isDark ? 0.04 : 0.55))
                 .frame(width: 220, height: 220)
                 .blur(radius: 28)
                 .offset(x: -90, y: -120)
 
             Circle()
-                .fill(Color.cyan.opacity(0.22))
+                .fill(Color.cyan.opacity(isDark ? 0.08 : 0.22))
                 .frame(width: 180, height: 180)
                 .blur(radius: 30)
                 .offset(x: 110, y: 120)
 
             Circle()
-                .fill(Color.mint.opacity(0.18))
+                .fill(Color.mint.opacity(isDark ? 0.06 : 0.18))
                 .frame(width: 140, height: 140)
                 .blur(radius: 24)
                 .offset(x: 100, y: -90)
@@ -135,21 +192,29 @@ struct BatteryAtmosphereBackground: View {
     }
 }
 
+// MARK: - BatteryHairline
+
 struct BatteryHairline: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
+        let isDark = colorScheme == .dark
+
         LinearGradient(
             colors: [
                 Color.white.opacity(0),
-                Color.white.opacity(0.72),
+                Color.white.opacity(isDark ? 0.16 : 0.72),
                 Color.white.opacity(0)
             ],
             startPoint: .leading,
             endPoint: .trailing
         )
         .frame(height: 1)
-        .opacity(0.72)
+        .opacity(isDark ? 0.50 : 0.72)
     }
 }
+
+// MARK: - MagicBatteryMark
 
 struct MagicBatteryMark: View {
     var size: CGFloat = 40
@@ -180,6 +245,8 @@ struct MagicBatteryMark: View {
     }
 }
 
+// MARK: - BatteryControlButtonStyle
+
 private enum BatteryControlTone {
     case secondary
     case prominent
@@ -189,6 +256,7 @@ private enum BatteryControlTone {
 private struct BatteryControlButtonStyle: ButtonStyle {
     let tone: BatteryControlTone
     let compact: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
     func makeBody(configuration: Configuration) -> some View {
         let metrics = compact ? Metrics.compact : Metrics.regular
@@ -212,28 +280,34 @@ private struct BatteryControlButtonStyle: ButtonStyle {
     }
 
     private var foregroundColor: Color {
+        let isDark = colorScheme == .dark
         switch tone {
         case .secondary:
-            return Color.black.opacity(0.78)
+            return isDark ? Color.white.opacity(0.82) : Color.black.opacity(0.78)
         case .prominent:
             return .white
         case .destructive:
-            return Color(red: 0.58, green: 0.15, blue: 0.14)
+            return isDark
+                ? Color(red: 0.96, green: 0.42, blue: 0.40)
+                : Color(red: 0.58, green: 0.15, blue: 0.14)
         }
     }
 
     private var borderColor: Color {
+        let isDark = colorScheme == .dark
         switch tone {
         case .secondary:
-            return Color.white.opacity(0.72)
+            return isDark ? Color.white.opacity(0.14) : Color.white.opacity(0.72)
         case .prominent:
             return Color.white.opacity(0.24)
         case .destructive:
-            return Color.white.opacity(0.70)
+            return isDark ? Color.white.opacity(0.12) : Color.white.opacity(0.70)
         }
     }
 
     private var shadowColor: Color {
+        let isDark = colorScheme == .dark
+        if isDark { return .clear }
         switch tone {
         case .secondary:
             return .black.opacity(0.08)
@@ -245,13 +319,19 @@ private struct BatteryControlButtonStyle: ButtonStyle {
     }
 
     private func background(_ isPressed: Bool) -> LinearGradient {
+        let isDark = colorScheme == .dark
         switch tone {
         case .secondary:
             return LinearGradient(
-                colors: [
-                    Color.white.opacity(isPressed ? 0.70 : 0.82),
-                    Color.white.opacity(isPressed ? 0.56 : 0.68)
-                ],
+                colors: isDark
+                    ? [
+                        Color.white.opacity(isPressed ? 0.10 : 0.14),
+                        Color.white.opacity(isPressed ? 0.06 : 0.10)
+                    ]
+                    : [
+                        Color.white.opacity(isPressed ? 0.70 : 0.82),
+                        Color.white.opacity(isPressed ? 0.56 : 0.68)
+                    ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -266,10 +346,15 @@ private struct BatteryControlButtonStyle: ButtonStyle {
             )
         case .destructive:
             return LinearGradient(
-                colors: [
-                    Color.white.opacity(isPressed ? 0.72 : 0.82),
-                    Color(red: 1, green: 0.95, blue: 0.95).opacity(isPressed ? 0.62 : 0.76)
-                ],
+                colors: isDark
+                    ? [
+                        Color.red.opacity(isPressed ? 0.20 : 0.14),
+                        Color.red.opacity(isPressed ? 0.14 : 0.10)
+                    ]
+                    : [
+                        Color.white.opacity(isPressed ? 0.72 : 0.82),
+                        Color(red: 1, green: 0.95, blue: 0.95).opacity(isPressed ? 0.62 : 0.76)
+                    ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -286,11 +371,16 @@ private struct BatteryControlButtonStyle: ButtonStyle {
     }
 }
 
+// MARK: - BatteryToolbarChipModifier
+
 private struct BatteryToolbarChipModifier: ViewModifier {
     let tint: Color
     let foreground: Color
+    @Environment(\.colorScheme) private var colorScheme
 
     func body(content: Content) -> some View {
+        let isDark = colorScheme == .dark
+
         content
             .foregroundStyle(foreground)
             .padding(.horizontal, 7)
@@ -309,9 +399,15 @@ private struct BatteryToolbarChipModifier: ViewModifier {
                     )
                     .overlay(
                         Capsule(style: .continuous)
-                            .stroke(Color.white.opacity(0.68), lineWidth: 1)
+                            .stroke(
+                                Color.white.opacity(isDark ? 0.12 : 0.68),
+                                lineWidth: 1
+                            )
                     )
-                    .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
+                    .shadow(
+                        color: isDark ? .clear : .black.opacity(0.05),
+                        radius: 8, y: 4
+                    )
             }
     }
 }
