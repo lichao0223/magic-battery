@@ -49,6 +49,10 @@
 "settings.app.show_in_dock" = "Show in Dock";
 "settings.app.launch_at_login" = "Launch at Login";
 "settings.app.launch_description" = "App will launch automatically at system startup";
+"settings.app.appearance" = "Appearance";
+"settings.app.appearance.system" = "System";
+"settings.app.appearance.light" = "Light";
+"settings.app.appearance.dark" = "Dark";
 
 // About Section
 "settings.about.title" = "About";
