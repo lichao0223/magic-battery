@@ -49,6 +49,10 @@
 "settings.app.show_in_dock" = "在 Dock 中显示";
 "settings.app.launch_at_login" = "登录时启动";
 "settings.app.launch_description" = "应用将在系统启动时自动运行";
+"settings.app.appearance" = "外观";
+"settings.app.appearance.system" = "跟随系统";
+"settings.app.appearance.light" = "浅色";
+"settings.app.appearance.dark" = "暗色";
 
 // About Section
 "settings.about.title" = "关于";

@@ -6,6 +6,15 @@ struct MenuBarPopoverView: View {
     @ObservedObject var viewModel: DeviceListViewModel
     @State private var showSettings = false
     @State private var selectedDevice: Device?
+    @AppStorage("appearanceMode") private var appearanceMode = 0
+
+    private var resolvedColorScheme: ColorScheme? {
+        switch appearanceMode {
+        case 1: return .light
+        case 2: return .dark
+        default: return nil
+        }
+    }
 
     var body: some View {
         Group {
@@ -21,6 +30,7 @@ struct MenuBarPopoverView: View {
         .padding(10)
         .background(BatteryAtmosphereBackground())
         .batteryPanelSurface(cornerRadius: 30, tint: Color.white.opacity(0.08))
+        .preferredColorScheme(resolvedColorScheme)
         .sheet(item: $selectedDevice) { device in
             DeviceDetailsSheet(device: device)
         }
@@ -53,11 +63,11 @@ struct MenuBarPopoverView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text("app.name")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.black.opacity(0.82))
+                    .foregroundStyle(Color.primary)
 
                 Text(headerSubtitle)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.56))
+                    .foregroundStyle(Color.secondary)
             }
 
             Spacer(minLength: 10)
@@ -143,7 +153,7 @@ struct MenuBarPopoverView: View {
                 .scaleEffect(0.8)
             Text("popover.loading")
                 .font(.system(size: 12))
-                .foregroundColor(Color.black.opacity(0.56))
+                .foregroundColor(Color.secondary)
         }
         .frame(maxWidth: .infinity, minHeight: 150)
         .padding(.horizontal, 16)
@@ -156,10 +166,10 @@ struct MenuBarPopoverView: View {
             MagicBatteryMark(size: 60)
             Text("popover.empty.title")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Color.black.opacity(0.76))
+                .foregroundStyle(Color.primary)
             Text("popover.empty.subtitle")
                 .font(.system(size: 11))
-                .foregroundStyle(Color.black.opacity(0.54))
+                .foregroundStyle(Color.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 220)
         }
@@ -271,13 +281,13 @@ struct MenuBarPopoverView: View {
         HStack(spacing: 8) {
             Text(title)
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color.black.opacity(0.62))
+                .foregroundStyle(Color.secondary)
 
             Text("\(count)")
                 .font(.system(size: 10, weight: .semibold))
                 .batteryToolbarChip(
                     tint: Color.white.opacity(0.66),
-                    foreground: Color.black.opacity(0.60)
+                    foreground: Color.secondary
                 )
 
             Spacer(minLength: 0)

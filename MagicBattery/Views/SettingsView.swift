@@ -11,6 +11,7 @@ struct SettingsView: View {
     @AppStorage("enableIDeviceDiscovery") private var enableIDeviceDiscovery = true
     @AppStorage("enableWatchBatteryDiscovery") private var enableWatchBatteryDiscovery = true
     @AppStorage("showOfflineIDevices") private var showOfflineIDevices = true
+    @AppStorage("appearanceMode") private var appearanceMode = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -26,6 +27,14 @@ struct SettingsView: View {
         SMAppService.mainApp.status == .enabled
     }
 
+    private var resolvedColorScheme: ColorScheme? {
+        switch appearanceMode {
+        case 1: return .light
+        case 2: return .dark
+        default: return nil
+        }
+    }
+
 
     var body: some View {
         Group {
@@ -38,6 +47,7 @@ struct SettingsView: View {
             }
         }
         .frame(width: 512, height: 560)
+        .preferredColorScheme(resolvedColorScheme)
         .padding(14)
         .background(BatteryAtmosphereBackground())
         .batteryPanelSurface(cornerRadius: 32, tint: Color.white.opacity(0.08))
@@ -78,11 +88,11 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text("settings.title")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.black.opacity(0.82))
+                    .foregroundStyle(Color.primary)
 
                 Text("settings.subtitle")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.56))
+                    .foregroundStyle(Color.secondary)
             }
 
             Spacer()
@@ -114,7 +124,7 @@ struct SettingsView: View {
                     HStack {
                         Text("settings.notification.threshold")
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(Color.black.opacity(0.70))
+                            .foregroundStyle(Color.primary.opacity(0.85))
 
                         Spacer()
 
@@ -122,7 +132,7 @@ struct SettingsView: View {
                             .font(.system(size: 12, weight: .semibold))
                             .batteryToolbarChip(
                                 tint: Color.mint.opacity(0.16),
-                                foreground: Color.black.opacity(0.72)
+                                foreground: Color.primary.opacity(0.85)
                             )
                     }
 
@@ -159,7 +169,7 @@ struct SettingsView: View {
                 HStack {
                     Text("settings.update.interval")
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.black.opacity(0.70))
+                        .foregroundStyle(Color.primary.opacity(0.85))
 
                     Spacer()
 
@@ -167,7 +177,7 @@ struct SettingsView: View {
                         .font(.system(size: 12, weight: .semibold))
                         .batteryToolbarChip(
                             tint: Color.cyan.opacity(0.14),
-                            foreground: Color.black.opacity(0.72)
+                            foreground: Color.primary.opacity(0.85)
                         )
                 }
 
@@ -194,7 +204,7 @@ struct SettingsView: View {
                 HStack {
                     Text("settings.ble.interval")
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.black.opacity(0.70))
+                        .foregroundStyle(Color.primary.opacity(0.85))
 
                     Spacer()
 
@@ -202,7 +212,7 @@ struct SettingsView: View {
                         .font(.system(size: 12, weight: .semibold))
                         .batteryToolbarChip(
                             tint: Color.purple.opacity(0.14),
-                            foreground: Color.black.opacity(0.72)
+                            foreground: Color.primary.opacity(0.85)
                         )
                 }
 
@@ -246,6 +256,16 @@ struct SettingsView: View {
                 }
             ))
             .toggleStyle(.switch)
+
+            Picker(selection: $appearanceMode) {
+                Text("settings.app.appearance.system").tag(0)
+                Text("settings.app.appearance.light").tag(1)
+                Text("settings.app.appearance.dark").tag(2)
+            } label: {
+                Text("settings.app.appearance")
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .pickerStyle(.segmented)
 
             Text("settings.app.launch_description")
                 .font(.system(size: 11))
@@ -352,6 +372,7 @@ struct SettingsView: View {
         enableIDeviceDiscovery = true
         enableWatchBatteryDiscovery = true
         showOfflineIDevices = true
+        appearanceMode = 0
     }
 
     private func sectionCard<Content: View>(
@@ -363,11 +384,11 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.black.opacity(0.80))
+                    .foregroundStyle(Color.primary)
 
                 Text(subtitle)
                     .font(.system(size: 11))
-                    .foregroundStyle(Color.black.opacity(0.54))
+                    .foregroundStyle(Color.secondary)
             }
 
             content()

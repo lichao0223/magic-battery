@@ -4,7 +4,17 @@ struct DeviceDetailsSheet: View {
     let device: Device
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    @AppStorage("appearanceMode") private var appearanceMode = 0
     @StateObject private var viewModel: DeviceDetailsViewModel
+
+    private var resolvedColorScheme: ColorScheme? {
+        switch appearanceMode {
+        case 1: return .light
+        case 2: return .dark
+        default: return nil
+        }
+    }
 
     init(device: Device) {
         self.device = device
@@ -22,6 +32,7 @@ struct DeviceDetailsSheet: View {
             }
         }
         .frame(width: 456, height: 620, alignment: .top)
+        .preferredColorScheme(resolvedColorScheme)
         .padding(10)
         .background(BatteryAtmosphereBackground())
         .batteryPanelSurface(cornerRadius: 30, tint: Color.white.opacity(0.08))
@@ -54,34 +65,33 @@ struct DeviceDetailsSheet: View {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(
                         LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.94),
-                                Color(red: 0.92, green: 0.97, blue: 0.99).opacity(0.88)
-                            ],
+                            colors: colorScheme == .dark
+                                ? [Color.white.opacity(0.10), Color.white.opacity(0.06)]
+                                : [Color.white.opacity(0.94), Color(red: 0.92, green: 0.97, blue: 0.99).opacity(0.88)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(Color.white.opacity(0.88), lineWidth: 1)
+                            .stroke(colorScheme == .dark ? Color.white.opacity(0.12) : Color.white.opacity(0.88), lineWidth: 1)
                     )
 
                 Image(systemName: device.icon.symbolName)
                     .font(.system(size: 26, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.74))
+                    .foregroundStyle(Color.primary.opacity(0.85))
             }
             .frame(width: 52, height: 52)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(device.name)
                     .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Color.black.opacity(0.82))
+                    .foregroundStyle(Color.primary)
                     .lineLimit(1)
 
                 Text(viewModel.snapshot?.subtitle ?? defaultSubtitle)
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.56))
+                    .foregroundStyle(Color.secondary)
                     .lineLimit(2)
             }
 
@@ -120,7 +130,7 @@ struct DeviceDetailsSheet: View {
                     .scaleEffect(0.85)
                 Text("details.loading")
                     .font(.system(size: 12))
-                    .foregroundStyle(Color.black.opacity(0.58))
+                    .foregroundStyle(Color.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 16)
@@ -136,7 +146,7 @@ struct DeviceDetailsSheet: View {
                     }
 
                     if let footnote = snapshot.footnote {
-                        inlineNote(text: footnote, tone: Color.black.opacity(0.62))
+                        inlineNote(text: footnote, tone: Color.secondary)
                     }
                 }
                 .padding(.horizontal, 12)
@@ -149,10 +159,10 @@ struct DeviceDetailsSheet: View {
                     .foregroundStyle(Color.orange.opacity(0.88))
                 Text(viewModel.errorMessage ?? String(localized: "details.unavailable"))
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.black.opacity(0.78))
+                    .foregroundStyle(Color.primary)
                 Text("details.retry_hint")
                     .font(.system(size: 11))
-                    .foregroundStyle(Color.black.opacity(0.54))
+                    .foregroundStyle(Color.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 16)
@@ -196,10 +206,10 @@ struct DeviceDetailsSheet: View {
         .padding(.vertical, 8)
         .background(
             Capsule(style: .continuous)
-                .fill(Color.white.opacity(0.78))
+                .fill(colorScheme == .dark ? Color.white.opacity(0.10) : Color.white.opacity(0.78))
                 .overlay(
                     Capsule(style: .continuous)
-                        .stroke(Color.white.opacity(0.72), lineWidth: 1)
+                        .stroke(colorScheme == .dark ? Color.white.opacity(0.14) : Color.white.opacity(0.72), lineWidth: 1)
                 )
         )
     }
@@ -227,7 +237,7 @@ private struct DeviceDetailSectionCard: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(section.title)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color.black.opacity(0.72))
+                .foregroundStyle(Color.secondary)
 
             VStack(spacing: 0) {
                 ForEach(Array(section.items.enumerated()), id: \.element.id) { index, item in
@@ -254,20 +264,20 @@ private struct DeviceDetailItemRow: View {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 Text(item.title)
                     .font(.system(size: 11.5, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.56))
+                    .foregroundStyle(Color.secondary)
 
                 Spacer(minLength: 8)
 
                 Text(item.value)
                     .font(.system(size: 12.5, weight: .semibold))
-                    .foregroundStyle(Color.black.opacity(0.80))
+                    .foregroundStyle(Color.primary)
                     .multilineTextAlignment(.trailing)
             }
 
             if let detail = item.detail {
                 Text(detail)
                     .font(.system(size: 10))
-                    .foregroundStyle(Color.black.opacity(0.46))
+                    .foregroundStyle(Color.secondary.opacity(0.7))
             }
         }
         .padding(.vertical, 6)

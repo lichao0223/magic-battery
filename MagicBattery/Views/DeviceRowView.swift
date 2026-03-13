@@ -6,6 +6,7 @@ struct DeviceRowView: View {
     let device: Device
     var onTap: (() -> Void)? = nil
 
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("lowBatteryThreshold") private var lowBatteryThreshold = 20
 
     var body: some View {
@@ -43,36 +44,35 @@ struct DeviceRowView: View {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(
                         LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.92),
-                                Color(red: 0.92, green: 0.96, blue: 0.99).opacity(0.86)
-                            ],
+                            colors: colorScheme == .dark
+                                ? [Color.white.opacity(0.10), Color.white.opacity(0.06)]
+                                : [Color.white.opacity(0.92), Color(red: 0.92, green: 0.96, blue: 0.99).opacity(0.86)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(Color.white.opacity(0.88), lineWidth: 1)
+                            .stroke(colorScheme == .dark ? Color.white.opacity(0.12) : Color.white.opacity(0.88), lineWidth: 1)
                     )
 
                 Image(systemName: device.icon.symbolName)
                     .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(Color.black.opacity(0.70))
+                    .foregroundColor(Color.primary.opacity(0.85))
             }
             .frame(width: 38, height: 38)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(device.name)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(Color.black.opacity(0.82))
+                    .foregroundColor(Color.primary)
                     .lineLimit(1)
                     .layoutPriority(1)
 
                 HStack(spacing: 6) {
                     Text(device.type.displayName)
                         .font(.system(size: 10.5))
-                        .foregroundColor(Color.black.opacity(0.56))
+                        .foregroundColor(Color.secondary)
                         .lineLimit(1)
 
                     if let sourceLabel = device.sourceLabel {
@@ -81,8 +81,8 @@ struct DeviceRowView: View {
                             .lineLimit(1)
                             .fixedSize(horizontal: true, vertical: false)
                             .batteryToolbarChip(
-                                tint: Color.black.opacity(0.06),
-                                foreground: Color.black.opacity(0.64)
+                                tint: Color.primary.opacity(0.06),
+                                foreground: Color.secondary
                             )
                     }
 
@@ -101,7 +101,7 @@ struct DeviceRowView: View {
                 if let statusText = device.statusText {
                     Text(statusText)
                         .font(.system(size: 9.5))
-                        .foregroundColor(device.isStale ? .orange : Color.black.opacity(0.52))
+                        .foregroundColor(device.isStale ? .orange : Color.secondary)
                         .lineLimit(1)
                 }
             }
@@ -118,7 +118,7 @@ struct DeviceRowView: View {
                 if device.isBatteryUnknown {
                     Text("common.unknown")
                         .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(Color.black.opacity(0.58))
+                        .foregroundColor(Color.secondary)
                 } else {
                     Text("\(device.batteryLevel)%")
                         .font(.system(size: 14, weight: .bold))
@@ -130,7 +130,7 @@ struct DeviceRowView: View {
                 } else {
                     Image(systemName: "questionmark.circle")
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color.black.opacity(0.48))
+                        .foregroundColor(Color.secondary)
                 }
             }
             .padding(.horizontal, 9)
@@ -140,7 +140,7 @@ struct DeviceRowView: View {
                     .fill(batteryBadgeFill)
                     .overlay(
                         Capsule(style: .continuous)
-                            .stroke(Color.white.opacity(0.72), lineWidth: 1)
+                            .stroke(colorScheme == .dark ? Color.white.opacity(0.14) : Color.white.opacity(0.72), lineWidth: 1)
                     )
             )
 
@@ -154,7 +154,7 @@ struct DeviceRowView: View {
 
     private var batteryAccentColor: Color {
         if device.isBatteryUnknown {
-            return Color.black.opacity(0.56)
+            return Color.secondary
         }
         if device.batteryLevel <= lowBatteryThreshold {
             return Color(red: 0.79, green: 0.20, blue: 0.18)
@@ -169,8 +169,8 @@ struct DeviceRowView: View {
         let base: [Color]
         if device.isBatteryUnknown {
             base = [
-                Color.black.opacity(0.05),
-                Color.black.opacity(0.03)
+                Color.primary.opacity(0.05),
+                Color.primary.opacity(0.03)
             ]
         } else if device.batteryLevel <= lowBatteryThreshold {
             base = [
@@ -198,7 +198,7 @@ struct DeviceRowView: View {
             if onTap != nil {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color.black.opacity(0.36))
+                    .foregroundColor(Color.secondary.opacity(0.6))
             } else {
                 Color.clear
             }
