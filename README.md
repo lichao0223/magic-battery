@@ -63,7 +63,9 @@ MagicBattery/
 │   ├── DeviceDetailsService.swift    # 设备详情查询服务
 │   ├── StableDeviceIDStore.swift     # 设备 ID 持久化
 │   ├── DeviceTypeOverrideStore.swift # 设备类型手动覆盖
-│   ├── NotificationManager.swift     # 通知管理器
+│   ├── NotificationManager.swift     # 通知管理器（含自定义提示音）
+│   ├── BatteryHistoryStore.swift     # 电量历史记录存储
+│   ├── BluetoothSystemProfilerParser.swift # system_profiler 蓝牙输出解析
 │   └── PermissionManager.swift       # 权限管理器
 ├── ViewModels/            # 视图模型
 │   ├── DeviceListViewModel.swift     # 设备列表视图模型

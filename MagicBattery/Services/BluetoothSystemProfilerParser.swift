@@ -1,6 +1,6 @@
 import Foundation
 
-struct ParsedBluetoothAccessory: Equatable {
+struct BluetoothSystemProfilerAccessory: Equatable {
     let uniqueKey: String
     let name: String
     let normalizedName: String
@@ -10,9 +10,9 @@ struct ParsedBluetoothAccessory: Equatable {
 }
 
 enum BluetoothSystemProfilerParser {
-    static func parse(_ output: String) -> [ParsedBluetoothAccessory] {
+    static func parse(_ output: String) -> [BluetoothSystemProfilerAccessory] {
         let lines = output.components(separatedBy: .newlines)
-        var accessories: [ParsedBluetoothAccessory] = []
+        var accessories: [BluetoothSystemProfilerAccessory] = []
         var inConnectedSection = false
         var currentName: String?
         var currentFields: [String: String] = [:]
@@ -37,7 +37,7 @@ enum BluetoothSystemProfilerParser {
             if hasSplitBattery {
                 if let left {
                     accessories.append(
-                        ParsedBluetoothAccessory(
+                        BluetoothSystemProfilerAccessory(
                             uniqueKey: "\(uniqueKey)::left",
                             name: "\(currentName) · \(String(localized: "device.type.airpods_left"))",
                             normalizedName: normalizedName,
@@ -49,7 +49,7 @@ enum BluetoothSystemProfilerParser {
                 }
                 if let right {
                     accessories.append(
-                        ParsedBluetoothAccessory(
+                        BluetoothSystemProfilerAccessory(
                             uniqueKey: "\(uniqueKey)::right",
                             name: "\(currentName) · \(String(localized: "device.type.airpods_right"))",
                             normalizedName: normalizedName,
@@ -61,7 +61,7 @@ enum BluetoothSystemProfilerParser {
                 }
                 if let chargingCase {
                     accessories.append(
-                        ParsedBluetoothAccessory(
+                        BluetoothSystemProfilerAccessory(
                             uniqueKey: "\(uniqueKey)::case",
                             name: "\(currentName) · \(String(localized: "device.type.airpods_case"))",
                             normalizedName: normalizedName,
@@ -71,13 +71,24 @@ enum BluetoothSystemProfilerParser {
                         )
                     )
                 }
-            } else if let overall, overall >= 0 || isHeadphoneLike {
+            } else if let overall {
                 accessories.append(
-                    ParsedBluetoothAccessory(
+                    BluetoothSystemProfilerAccessory(
                         uniqueKey: uniqueKey,
                         name: currentName,
                         normalizedName: normalizedName,
                         batteryLevel: overall,
+                        type: baseType,
+                        parentUniqueKey: nil
+                    )
+                )
+            } else if isHeadphoneLike {
+                accessories.append(
+                    BluetoothSystemProfilerAccessory(
+                        uniqueKey: uniqueKey,
+                        name: currentName,
+                        normalizedName: normalizedName,
+                        batteryLevel: -1,
                         type: baseType,
                         parentUniqueKey: nil
                     )
@@ -118,7 +129,6 @@ enum BluetoothSystemProfilerParser {
             }
 
             guard currentName != nil else { continue }
-            guard currentIndent == Int.max || indent > currentIndent || trimmed.contains(": ") else { continue }
             guard let separatorRange = trimmed.range(of: ":") else { continue }
             let key = String(trimmed[..<separatorRange.lowerBound]).trimmingCharacters(in: .whitespaces)
             let value = String(trimmed[separatorRange.upperBound...]).trimmingCharacters(in: .whitespaces)
@@ -140,8 +150,7 @@ enum BluetoothSystemProfilerParser {
         name
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
-            .replacingOccurrences(of: "（", with: "(")
-            .replacingOccurrences(of: "）", with: ")")
+            .replacingOccurrences(of: "\u{00a0}", with: " ")
     }
 
     private static func determineDeviceType(fromName name: String) -> DeviceType {
@@ -149,7 +158,7 @@ enum BluetoothSystemProfilerParser {
         if normalizedName.contains("airpods") {
             return .airPods
         }
-        if normalizedName.contains("beats") || normalizedName.contains("buds") || normalizedName.contains("headphone") {
+        if normalizedName.contains("beats") || normalizedName.contains("buds") {
             return .bluetoothHeadphone
         }
         return .bluetoothDevice

@@ -3,36 +3,36 @@ import XCTest
 
 final class BluetoothDeviceServiceTests: XCTestCase {
 
-    private let sampleSystemProfilerOutput = #"""
-Bluetooth:
-
-Bluetooth Controller:
-Address: 50:F2:65:EA:DE:9F
-State: On
-Connected:
-Air75 V3-1:
-Address: E0:00:72:DE:8A:AA
-Vendor ID: 0x07D7
-Minor Type: Keyboard
-Services: 0x400000 < BLE >
-华强北 pro3:
-Address: 74:3F:8E:AC:1E:31
-Vendor ID: 0x004C
-Product ID: 0x2027
-Left Battery Level: 100%
-Right Battery Level: 100%
-Case Version: 8B34f
-Firmware Version: 8B34f
-Minor Type: Headphones
-RSSI: -63
-Serial Number: JT2X1HHWQC
-Serial Number (Left): GFDHQL0L6F10000UHZ
-Serial Number (Right): GMVHQK1M0Y00000UHY
-Services: 0x980019 < HFP AVRCP A2DP AACP GATT ACL >
-Not Connected:
-iPad:
-Address: 04:72:EF:29:B6:66
-"""#
+    private let sampleSystemProfilerOutput = [
+        "Bluetooth:",
+        "",
+        "Bluetooth Controller:",
+        "Address: 50:F2:65:EA:DE:9F",
+        "State: On",
+        "Connected:",
+        "Air75 V3-1:",
+        "Address: E0:00:72:DE:8A:AA",
+        "Vendor ID: 0x07D7",
+        "Minor Type: Keyboard",
+        "Services: 0x400000 < BLE >",
+        "华强北 pro3:",
+        "Address: 74:3F:8E:AC:1E:31",
+        "Vendor ID: 0x004C",
+        "Product ID: 0x2027",
+        "Left Battery Level: 100%",
+        "Right Battery Level: 100%",
+        "Case Version: 8B34f",
+        "Firmware Version: 8B34f",
+        "Minor Type: Headphones",
+        "RSSI: -63",
+        "Serial Number: JT2X1HHWQC",
+        "Serial Number (Left): GFDHQL0L6F10000UHZ",
+        "Serial Number (Right): GMVHQK1M0Y00000UHY",
+        "Services: 0x980019 < HFP AVRCP A2DP AACP GATT ACL >",
+        "Not Connected:",
+        "iPad:",
+        "Address: 04:72:EF:29:B6:66"
+    ].joined(separator: "\n")
 
     // MARK: - Device Deduplication Tests
 
