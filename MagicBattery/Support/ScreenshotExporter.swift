@@ -241,7 +241,7 @@ private struct MockDeviceDetailsView: View {
     }
 
     private var visibleSections: [DeviceDetailSection] {
-        Array(snapshot.sections.prefix(3))
+        Array(snapshot.sections.prefix(2))
     }
 
     var body: some View {
@@ -267,6 +267,8 @@ private struct MockDeviceDetailsView: View {
             BatteryHairline().padding(.horizontal, 12)
 
             VStack(spacing: 12) {
+                DeviceHistoryChartCard(samples: MockData.detailHistorySamples)
+
                 ForEach(visibleSections) { section in
                     MockDeviceDetailSectionCard(section: section)
                 }

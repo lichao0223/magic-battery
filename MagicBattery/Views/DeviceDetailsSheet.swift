@@ -235,7 +235,7 @@ struct DeviceDetailsSheet: View {
     }
 }
 
-private struct DeviceHistoryChartCard: View {
+struct DeviceHistoryChartCard: View {
     let samples: [BatteryHistorySample]
 
     private var sortedSamples: [BatteryHistorySample] {
@@ -258,11 +258,11 @@ private struct DeviceHistoryChartCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("details.history.title")
+                    Text(String(localized: "details.history.title"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.secondary)
 
-                    Text("details.history.subtitle")
+                    Text(String(localized: "details.history.subtitle"))
                         .font(.system(size: 10.5))
                         .foregroundStyle(Color.secondary.opacity(0.8))
                 }

@@ -144,10 +144,34 @@ enum MockData {
         )
     }
 
+    static var detailHistorySamples: [BatteryHistorySample] {
+        let calendar = Calendar.current
+        let now = Date()
+        let points: [(hoursAgo: Int, level: Int, charging: Bool)] = [
+            (22, 84, false),
+            (18, 78, false),
+            (14, 73, false),
+            (10, 69, false),
+            (7, 65, false),
+            (4, 62, false),
+            (2, 61, false),
+            (0, 61, false)
+        ]
+
+        return points.map { point in
+            BatteryHistorySample(
+                timestamp: calendar.date(byAdding: .hour, value: -point.hoursAgo, to: now) ?? now,
+                batteryLevel: point.level,
+                isCharging: point.charging
+            )
+        }
+    }
+
     static func applyScreenshotDefaults() {
         let defaults = UserDefaults.standard
         defaults.set(true, forKey: "enableNotifications")
         defaults.set(20, forKey: "lowBatteryThreshold")
+        defaults.set(NotificationSoundOption.glass.rawValue, forKey: "notificationSound")
         defaults.set(60, forKey: "updateInterval")
         defaults.set(120, forKey: "bleScanInterval")
         defaults.set(false, forKey: "showInDock")
