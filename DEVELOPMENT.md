@@ -35,6 +35,7 @@ open battery.xcodeproj
    - 进入 Signing & Capabilities
    - 确保 Automatically manage signing 已启用
    - 如 Xcode 未自动选择 Team，手动选择你的开发团队
+   - 仓库默认不再提交固定 `DEVELOPMENT_TEAM`，首次在本机打开时需要手动选一次 Team
 
 ## 项目配置
 
@@ -61,14 +62,16 @@ APP_GROUP_IDENTIFIER = group.com.lc.battery
 <key>NSBluetoothAlwaysUsageDescription</key>
 <string>需要访问蓝牙以监控蓝牙设备的电池状态</string>
 
-<key>NSUserNotificationsUsageDescription</key>
-<string>需要发送通知以提醒您设备电量过低</string>
+<key>NSLocalNetworkUsageDescription</key>
+<string>需要访问本地网络以发现已配对的 iPhone、iPad 并读取其电量信息</string>
 
 <key>LSUIElement</key>
 <true/>
 ```
 
-注意：`LSUIElement` 设置为 true 可以隐藏 Dock 图标。
+注意：
+- `LSUIElement` 设置为 true 可以隐藏 Dock 图标。
+- macOS 的通知授权由 `UNUserNotificationCenter` 在运行时请求，不需要额外添加 `NSUserNotificationsUsageDescription`。
 
 ### 构建配置
 
@@ -123,7 +126,7 @@ git checkout -b feature/new-feature
 ```bash
 # 编写代码
 # 运行测试
-xcodebuild test -scheme battery
+./scripts/run-local.sh test
 ```
 
 3. 提交代码
@@ -317,7 +320,7 @@ WidgetCenter.shared.reloadAllTimelines()
 
 运行所有测试：
 ```bash
-xcodebuild test -scheme battery -destination 'platform=macOS'
+./scripts/run-local.sh test
 ```
 
 运行特定测试：

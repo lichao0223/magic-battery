@@ -1,5 +1,6 @@
 .DS_Store
 .build/
+.build-local/
 .claude/
 .deriveddata/
 .swift-module-cache/

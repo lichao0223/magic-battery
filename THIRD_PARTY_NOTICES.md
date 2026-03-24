@@ -19,7 +19,7 @@ This repository includes prebuilt third-party tools and dynamic libraries under 
 - `Vendor/libimobiledevice/lib/libimobiledevice-1.0.6.dylib`
 - `Vendor/libimobiledevice/lib/libimobiledevice-glue-1.0.0.dylib`
 - `Vendor/libimobiledevice/lib/libplist-2.0.4.dylib`
-- `Vendor/libimobiledevice/lib/libusbmuxd-2.0.6.dylib`
+- `Vendor/libimobiledevice/lib/libusbmuxd-2.0.7.dylib`
 - `Vendor/libimobiledevice/lib/libcrypto.3.dylib`
 - `Vendor/libimobiledevice/lib/libssl.3.dylib`
 
