@@ -239,7 +239,7 @@ create-dmg \
   --icon "MagicBattery.app" 200 190 \
   --hide-extension "MagicBattery.app" \
   --app-drop-link 600 185 \
-  "battery-1.0.0.dmg" \
+  "battery-0.0.1.dmg" \
   "./build/MagicBattery.app"
 ```
 

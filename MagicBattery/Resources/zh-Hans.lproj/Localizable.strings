@@ -178,6 +178,11 @@
 "details.retry_hint" = "请确认设备在线后再试一次。";
 "details.offline_hint" = "当前设备处于离线状态，详情可能无法刷新。";
 "details.default_subtitle" = "设备电池详情";
+"details.history.title" = "电量历史";
+"details.history.subtitle" = "最近 24 小时";
+"details.history.current" = "当前";
+"details.history.range" = "区间";
+"details.history_fallback_note" = "这个设备的实时详情字段暂未完全支持，但已经可以开始记录和展示电量历史。";
 
 // MARK: - Sort & Group
 "sort.ascending" = "正序";
