@@ -511,7 +511,7 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
             "AppleBluetoothHIDMouse"
         ]
 
-        var accessories: [RegistryAccessory] = []
+        var accessories: [RegistryAccessory] = getBluetoothAccessoriesFromSystemProfiler()
         for className in classNames {
             accessories.append(contentsOf: collectRegistryAccessories(for: className))
         }
@@ -528,6 +528,177 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
             }
         }
         return Array(bestByKey.values)
+    }
+
+    private func getBluetoothAccessoriesFromSystemProfiler() -> [RegistryAccessory] {
+        guard let output = runSystemProfilerBluetooth() else { return [] }
+        return parseSystemProfilerBluetoothOutput(output)
+    }
+
+    private func runSystemProfilerBluetooth(timeout: TimeInterval = 8) -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
+        process.arguments = ["SPBluetoothDataType"]
+
+        let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
+        process.standardOutput = stdoutPipe
+        process.standardError = stderrPipe
+
+        let semaphore = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in
+            semaphore.signal()
+        }
+
+        do {
+            try process.run()
+        } catch {
+            debugLog("system_profiler 启动失败: \(error.localizedDescription)")
+            return nil
+        }
+
+        let didExit = semaphore.wait(timeout: .now() + timeout) == .success
+        if !didExit {
+            process.terminate()
+            _ = semaphore.wait(timeout: .now() + 1)
+            debugLog("system_profiler 超时")
+            return nil
+        }
+
+        let stdout = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+        let stderr = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+        if process.terminationStatus != 0 {
+            let stderrText = String(decoding: stderr, as: UTF8.self)
+            debugLog("system_profiler 退出失败: \(stderrText)")
+            return nil
+        }
+
+        return String(decoding: stdout, as: UTF8.self)
+    }
+
+    private func parseSystemProfilerBluetoothOutput(_ output: String) -> [RegistryAccessory] {
+        let lines = output.components(separatedBy: .newlines)
+        var accessories: [RegistryAccessory] = []
+        var inConnectedSection = false
+        var currentName: String?
+        var currentFields: [String: String] = [:]
+        var currentIndent = Int.max
+
+        func flushCurrent() {
+            guard let currentName else { return }
+            let normalizedName = normalizeDeviceName(currentName)
+            let address = currentFields["Address"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let serial = currentFields["Serial Number"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let uniqueKey = serial ?? address ?? normalizedName
+            let minorType = currentFields["Minor Type"]?.lowercased() ?? ""
+
+            let left = parsePercent(currentFields["Left Battery Level"])
+            let right = parsePercent(currentFields["Right Battery Level"])
+            let chargingCase = parsePercent(currentFields["Case Battery Level"])
+            let overall = parsePercent(currentFields["Battery Level"])
+            let hasSplitBattery = left != nil || right != nil || chargingCase != nil
+            let isHeadphoneLike = minorType.contains("headphone") || minorType.contains("headset") || minorType.contains("earbud")
+            let baseType: DeviceType = hasSplitBattery ? .airPods : determineDeviceType(fromName: currentName)
+
+            if hasSplitBattery {
+                if let left {
+                    accessories.append(
+                        RegistryAccessory(
+                            uniqueKey: "\(uniqueKey)::left",
+                            name: "\(currentName) · \(String(localized: "device.type.airpods_left"))",
+                            normalizedName: normalizedName,
+                            batteryLevel: left,
+                            type: .airPodsLeft,
+                            parentUniqueKey: uniqueKey
+                        )
+                    )
+                }
+                if let right {
+                    accessories.append(
+                        RegistryAccessory(
+                            uniqueKey: "\(uniqueKey)::right",
+                            name: "\(currentName) · \(String(localized: "device.type.airpods_right"))",
+                            normalizedName: normalizedName,
+                            batteryLevel: right,
+                            type: .airPodsRight,
+                            parentUniqueKey: uniqueKey
+                        )
+                    )
+                }
+                if let chargingCase {
+                    accessories.append(
+                        RegistryAccessory(
+                            uniqueKey: "\(uniqueKey)::case",
+                            name: "\(currentName) · \(String(localized: "device.type.airpods_case"))",
+                            normalizedName: normalizedName,
+                            batteryLevel: chargingCase,
+                            type: .airPodsCase,
+                            parentUniqueKey: uniqueKey
+                        )
+                    )
+                }
+            } else if let overall, overall >= 0 || isHeadphoneLike {
+                accessories.append(
+                    RegistryAccessory(
+                        uniqueKey: uniqueKey,
+                        name: currentName,
+                        normalizedName: normalizedName,
+                        batteryLevel: overall,
+                        type: baseType,
+                        parentUniqueKey: nil
+                    )
+                )
+            }
+        }
+
+        for rawLine in lines {
+            let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty { continue }
+
+            if trimmed == "Connected:" {
+                flushCurrent()
+                inConnectedSection = true
+                currentName = nil
+                currentFields = [:]
+                currentIndent = Int.max
+                continue
+            }
+
+            if trimmed == "Not Connected:" {
+                flushCurrent()
+                inConnectedSection = false
+                currentName = nil
+                currentFields = [:]
+                continue
+            }
+
+            guard inConnectedSection else { continue }
+
+            let indent = rawLine.prefix { $0 == " " || $0 == "\t" }.count
+            if trimmed.hasSuffix(":") && !trimmed.contains(": ") {
+                flushCurrent()
+                currentName = String(trimmed.dropLast())
+                currentFields = [:]
+                currentIndent = indent
+                continue
+            }
+
+            guard currentName != nil, indent > currentIndent else { continue }
+            guard let separatorRange = trimmed.range(of: ":") else { continue }
+            let key = String(trimmed[..<separatorRange.lowerBound]).trimmingCharacters(in: .whitespaces)
+            let value = String(trimmed[separatorRange.upperBound...]).trimmingCharacters(in: .whitespaces)
+            currentFields[key] = value
+        }
+
+        flushCurrent()
+        return accessories
+    }
+
+    private func parsePercent(_ value: String?) -> Int? {
+        guard let value else { return nil }
+        let digits = value.filter { $0.isNumber }
+        guard let level = Int(digits) else { return nil }
+        return max(-1, min(100, level))
     }
 
     private func collectRegistryAccessories(for className: String) -> [RegistryAccessory] {
