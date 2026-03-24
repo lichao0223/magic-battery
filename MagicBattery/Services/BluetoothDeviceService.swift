@@ -532,7 +532,16 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
 
     private func getBluetoothAccessoriesFromSystemProfiler() -> [RegistryAccessory] {
         guard let output = runSystemProfilerBluetooth() else { return [] }
-        return parseSystemProfilerBluetoothOutput(output)
+        return BluetoothSystemProfilerParser.parse(output).map {
+            RegistryAccessory(
+                uniqueKey: $0.uniqueKey,
+                name: $0.name,
+                normalizedName: $0.normalizedName,
+                batteryLevel: $0.batteryLevel,
+                type: $0.type,
+                parentUniqueKey: $0.parentUniqueKey
+            )
+        }
     }
 
     private func runSystemProfilerBluetooth(timeout: TimeInterval = 8) -> String? {
