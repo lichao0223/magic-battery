@@ -366,7 +366,7 @@ xcodebuild test -scheme battery -only-testing:batteryTests/DeviceTests
 ### 1. 版本号更新
 
 在 Xcode 中更新版本号：
-- Version: 1.0.0
+- Version: 0.0.1
 - Build: 1
 
 ### 2. 构建 Release 版本
