@@ -2,6 +2,26 @@
 
 一个用于监控 Mac、蓝牙设备以及已信任 iPhone / iPad 电池状态的 macOS 菜单栏应用。
 
+## 应用截图
+
+以下截图均使用项目内置 Mock 数据导出，并额外裁剪为更适合 README 展示的尺寸。
+
+### 菜单栏弹窗
+
+<img src="docs/screenshots/01-menubar-popover-readme.png" alt="MagicBattery 菜单栏弹窗" width="320" />
+
+### 设备详情页
+
+<img src="docs/screenshots/02-device-details-readme.png" alt="MagicBattery 设备详情页" width="340" />
+
+### 设置页面
+
+<img src="docs/screenshots/03-settings-readme.png" alt="MagicBattery 设置页面" width="520" />
+
+### 小组件
+
+<img src="docs/screenshots/04-widget-readme.png" alt="MagicBattery 小组件" width="720" />
+
 ## 功能特性
 
 ### 核心功能
@@ -153,6 +173,20 @@ cd battery
 ```bash
 ./scripts/run-local.sh test
 ```
+
+**使用 Mock 数据启动 App（用于演示 / 本地对 UI 做快速检查）**
+
+```bash
+./scripts/run-local.sh mock
+```
+
+**导出 README 用截图（菜单栏弹窗 / 设备详情 / 设置页 / 小组件）**
+
+```bash
+./scripts/run-local.sh screenshots
+```
+
+导出的原始 PNG 默认位于 `docs/screenshots/`，可按 README 需要继续裁剪或缩放生成展示版图片。
 
 **Xcode / 已配置 Team 的签名构建**
 
