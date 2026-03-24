@@ -6,21 +6,21 @@
 
 以下截图均使用项目内置 Mock 数据导出，并额外裁剪为更适合 README 展示的尺寸。
 
-### 菜单栏弹窗
+### App 界面
 
-<img src="docs/screenshots/01-menubar-popover-readme.png" alt="MagicBattery 菜单栏弹窗" width="320" />
+<p align="center">
+  <img src="docs/screenshots/01-menubar-popover-readme.png" alt="MagicBattery 菜单栏弹窗" width="30.5%" />
+  <img src="docs/screenshots/02-device-details-readme.png" alt="MagicBattery 设备详情页" width="32.5%" />
+  <img src="docs/screenshots/03-settings-readme.png" alt="MagicBattery 设置页面" width="37%" />
+</p>
 
-### 设备详情页
+### Widget 尺寸
 
-<img src="docs/screenshots/02-device-details-readme.png" alt="MagicBattery 设备详情页" width="340" />
-
-### 设置页面
-
-<img src="docs/screenshots/03-settings-readme.png" alt="MagicBattery 设置页面" width="520" />
-
-### 小组件
-
-<img src="docs/screenshots/04-widget-readme.png" alt="MagicBattery 小组件" width="720" />
+<p align="center">
+  <img src="docs/screenshots/04-widget-small-readme.png" alt="MagicBattery 小尺寸 Widget" width="24%" />
+  <img src="docs/screenshots/05-widget-medium-readme.png" alt="MagicBattery 中尺寸 Widget" width="51%" />
+  <img src="docs/screenshots/06-widget-large-readme.png" alt="MagicBattery 大尺寸 Widget" width="24%" />
+</p>
 
 ## 功能特性
 
@@ -180,13 +180,13 @@ cd battery
 ./scripts/run-local.sh mock
 ```
 
-**导出 README 用截图（菜单栏弹窗 / 设备详情 / 设置页 / 小组件）**
+**导出 README 用截图（菜单栏弹窗 / 设备详情 / 设置页 / Widget 小中大尺寸）**
 
 ```bash
 ./scripts/run-local.sh screenshots
 ```
 
-导出的原始 PNG 默认位于 `docs/screenshots/`，可按 README 需要继续裁剪或缩放生成展示版图片。
+导出的原始 PNG 默认位于 `docs/screenshots/`；README 中使用的是额外裁剪/缩放后的 `*-readme.png` 版本。
 
 **Xcode / 已配置 Team 的签名构建**
 
