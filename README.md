@@ -119,7 +119,7 @@ cd battery
 
 ### 2. 配置签名与 App Group
 
-项目默认使用 `APP_GROUP_IDENTIFIER = group.com.lc.battery` 作为主应用和小组件之间的共享容器标识。
+项目默认使用 `APP_GROUP_IDENTIFIER = group.com.lc.battery` 作为主应用和小组件之间的共享容器标识。仓库不再写死 `DEVELOPMENT_TEAM`，首次在新机器打开时需要你自己选择 Team。
 
 1. 选择项目 -> `Signing & Capabilities`
 2. 确认 `Automatically manage signing` 已启用
@@ -129,19 +129,35 @@ cd battery
 
 ### 3. 配置 Info.plist
 
-确保 Info.plist 包含以下权限描述：
+项目当前通过 build settings 生成大部分 Info.plist 字段，至少需要以下权限描述：
 
 ```xml
 <key>NSBluetoothAlwaysUsageDescription</key>
 <string>需要访问蓝牙以监控蓝牙设备的电池状态</string>
-<key>NSUserNotificationsUsageDescription</key>
-<string>需要发送通知以提醒您设备电量过低</string>
+<key>NSLocalNetworkUsageDescription</key>
+<string>需要访问本地网络以发现已配对的 iPhone、iPad 并读取其电量信息</string>
 ```
+
+> macOS 的通知授权由 `UNUserNotificationCenter` 在运行时请求，不需要额外添加 `NSUserNotificationsUsageDescription`。
 
 ### 4. 构建项目
 
+**本地免签名调试运行（推荐）**
+
 ```bash
-xcodebuild -scheme battery -configuration Release
+./scripts/run-local.sh run
+```
+
+**本地免签名测试**
+
+```bash
+./scripts/run-local.sh test
+```
+
+**Xcode / 已配置 Team 的签名构建**
+
+```bash
+xcodebuild -scheme battery -configuration Release -allowProvisioningUpdates
 ```
 
 或在 Xcode 中直接运行（⌘R）

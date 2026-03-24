@@ -414,7 +414,11 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
         guard let deviceSet = IOHIDManagerCopyDevices(manager) else {
             return (devices: [], bleCandidateNames: Set<String>())
         }
-        let hidDevices = (deviceSet as NSSet).map { $0 as! IOHIDDevice }
+        let hidDevices = (deviceSet as NSSet).compactMap { device -> IOHIDDevice? in
+            let cfDevice = device as CFTypeRef
+            guard CFGetTypeID(cfDevice) == IOHIDDeviceGetTypeID() else { return nil }
+            return unsafeBitCast(cfDevice, to: IOHIDDevice.self)
+        }
         if hidDevices.isEmpty {
             return (devices: [], bleCandidateNames: Set<String>())
         }

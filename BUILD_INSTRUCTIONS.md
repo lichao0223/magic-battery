@@ -36,6 +36,8 @@ open battery.xcodeproj
 4. 确保 `Automatically manage signing` 已勾选
 5. 如 Xcode 未自动选择 Team，手动选择你的开发团队
 
+> 仓库默认不再提交固定的 `DEVELOPMENT_TEAM`，避免在其他机器上直接绑定到作者账号。首次打开工程时手动选择一次即可。
+
 #### 3.2 配置 App Group
 
 小组件需要 App Group 来共享数据。仓库默认使用以下可移植配置：
@@ -54,20 +56,22 @@ APP_GROUP_IDENTIFIER = group.com.lc.battery
 
 #### 3.3 配置 Info.plist
 
-确保 Info.plist 包含以下权限描述：
+项目当前通过 build settings 生成大部分 Info.plist 字段，关键权限描述如下：
 
 ```xml
 <key>NSBluetoothAlwaysUsageDescription</key>
 <string>需要访问蓝牙以监控蓝牙设备的电池状态</string>
 
-<key>NSUserNotificationsUsageDescription</key>
-<string>需要发送通知以提醒您设备电量过低</string>
+<key>NSLocalNetworkUsageDescription</key>
+<string>需要访问本地网络以发现已配对的 iPhone、iPad 并读取其电量信息</string>
 
 <key>LSUIElement</key>
 <true/>
 ```
 
-**注意**: `LSUIElement` 设置为 `true` 会隐藏 Dock 图标，使应用仅在菜单栏显示。
+**注意**:
+- `LSUIElement` 设置为 `true` 会隐藏 Dock 图标，使应用仅在菜单栏显示。
+- macOS 的通知授权由 `UNUserNotificationCenter` 在运行时请求，不需要额外添加 `NSUserNotificationsUsageDescription`。
 
 ### 4. 构建项目
 
@@ -80,14 +84,14 @@ APP_GROUP_IDENTIFIER = group.com.lc.battery
 #### 4.2 使用命令行
 
 ```bash
-# Debug 构建
-xcodebuild -scheme battery -configuration Debug
+# 本地免签名 Debug 构建并运行（推荐）
+./scripts/run-local.sh run
 
-# Release 构建
-xcodebuild -scheme battery -configuration Release
+# 本地免签名测试
+./scripts/run-local.sh test
 
-# 构建并运行
-xcodebuild -scheme battery -configuration Debug build
+# 已配置 Team 后执行签名 Release 构建
+xcodebuild -scheme battery -configuration Release -allowProvisioningUpdates
 ```
 
 ### 5. 运行测试
@@ -100,11 +104,14 @@ xcodebuild -scheme battery -configuration Debug build
 #### 5.2 使用命令行
 
 ```bash
-# 运行所有测试
-xcodebuild test -scheme battery -destination 'platform=macOS'
+# 运行所有测试（本地免签名）
+./scripts/run-local.sh test
+
+# 已配置 Team 后运行签名测试
+xcodebuild test -scheme battery -destination 'platform=macOS' -allowProvisioningUpdates
 
 # 运行特定测试
-xcodebuild test -scheme battery -only-testing:batteryTests/DeviceTests
+xcodebuild test -scheme battery -only-testing:batteryTests/DeviceTests -destination 'platform=macOS' -allowProvisioningUpdates
 ```
 
 ## 构建配置
@@ -180,14 +187,14 @@ xcodebuild test -scheme battery -only-testing:batteryTests/DeviceTests
 
 构建产物位置：
 ```
-~/Library/Developer/Xcode/DerivedData/battery-*/Build/Products/Debug/battery.app
+~/Library/Developer/Xcode/DerivedData/battery-*/Build/Products/Debug/MagicBattery.app
 ```
 
 ### Release 构建
 
 构建产物位置：
 ```
-~/Library/Developer/Xcode/DerivedData/battery-*/Build/Products/Release/battery.app
+~/Library/Developer/Xcode/DerivedData/battery-*/Build/Products/Release/MagicBattery.app
 ```
 
 ## 打包发布
@@ -229,11 +236,11 @@ create-dmg \
   --window-pos 200 120 \
   --window-size 800 400 \
   --icon-size 100 \
-  --icon "battery.app" 200 190 \
-  --hide-extension "battery.app" \
+  --icon "MagicBattery.app" 200 190 \
+  --hide-extension "MagicBattery.app" \
   --app-drop-link 600 185 \
   "battery-1.0.0.dmg" \
-  "./build/battery.app"
+  "./build/MagicBattery.app"
 ```
 
 ### 4. 代码签名和公证
@@ -241,22 +248,22 @@ create-dmg \
 #### 签名
 
 ```bash
-codesign --force --deep --sign "Developer ID Application: Your Name" battery.app
+codesign --force --deep --sign "Developer ID Application: Your Name" MagicBattery.app
 ```
 
 #### 公证
 
 ```bash
 # 创建 ZIP
-ditto -c -k --keepParent battery.app battery.zip
+ditto -c -k --keepParent MagicBattery.app MagicBattery.zip
 
 # 提交公证
-xcrun notarytool submit battery.zip \
+xcrun notarytool submit MagicBattery.zip \
   --keychain-profile "AC_PASSWORD" \
   --wait
 
 # 装订公证票据
-xcrun stapler staple battery.app
+xcrun stapler staple MagicBattery.app
 ```
 
 ## 开发环境设置
@@ -339,7 +346,7 @@ jobs:
       run: xcodebuild -scheme battery -configuration Release
     
     - name: Test
-      run: xcodebuild test -scheme battery -destination 'platform=macOS'
+      run: ./scripts/run-local.sh test
 ```
 
 ## 资源链接
