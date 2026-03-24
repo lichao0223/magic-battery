@@ -178,6 +178,11 @@
 "details.retry_hint" = "Please confirm the device is online and try again.";
 "details.offline_hint" = "Device is offline, details may not refresh.";
 "details.default_subtitle" = "Device Battery Details";
+"details.history.title" = "Battery History";
+"details.history.subtitle" = "Last 24 hours";
+"details.history.current" = "Current";
+"details.history.range" = "Range";
+"details.history_fallback_note" = "Live detail fields are unavailable for this device yet, but battery history can already be tracked.";
 
 // MARK: - Sort & Group
 "sort.ascending" = "Ascending";

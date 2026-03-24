@@ -544,20 +544,15 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
         }
     }
 
-    private func runSystemProfilerBluetooth(timeout: TimeInterval = 8) -> String? {
+    private func runSystemProfilerBluetooth(timeout: TimeInterval = 20) -> String? {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
-        process.arguments = ["SPBluetoothDataType"]
+        process.arguments = ["SPBluetoothDataType", "-detailLevel", "mini"]
 
         let stdoutPipe = Pipe()
         let stderrPipe = Pipe()
         process.standardOutput = stdoutPipe
         process.standardError = stderrPipe
-
-        let semaphore = DispatchSemaphore(value: 0)
-        process.terminationHandler = { _ in
-            semaphore.signal()
-        }
 
         do {
             try process.run()
@@ -566,16 +561,30 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
             return nil
         }
 
-        let didExit = semaphore.wait(timeout: .now() + timeout) == .success
-        if !didExit {
+        let group = DispatchGroup()
+        group.enter()
+        var stdout = Data()
+        DispatchQueue.global(qos: .utility).async {
+            stdout = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+            group.leave()
+        }
+
+        group.enter()
+        var stderr = Data()
+        DispatchQueue.global(qos: .utility).async {
+            stderr = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+            group.leave()
+        }
+
+        let waitResult = group.wait(timeout: .now() + timeout)
+        if waitResult == .timedOut {
             process.terminate()
-            _ = semaphore.wait(timeout: .now() + 1)
             debugLog("system_profiler 超时")
             return nil
         }
 
-        let stdout = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
-        let stderr = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+
         if process.terminationStatus != 0 {
             let stderrText = String(decoding: stderr, as: UTF8.self)
             debugLog("system_profiler 退出失败: \(stderrText)")

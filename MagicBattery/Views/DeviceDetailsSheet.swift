@@ -238,6 +238,15 @@ struct DeviceDetailsSheet: View {
 struct DeviceHistoryChartCard: View {
     let samples: [BatteryHistorySample]
 
+    private var isChineseLocale: Bool {
+        Locale.preferredLanguages.first?.lowercased().hasPrefix("zh") == true
+    }
+
+    private func localized(_ key: String, zh: String, en: String) -> String {
+        let value = NSLocalizedString(key, comment: "")
+        return value == key ? (isChineseLocale ? zh : en) : value
+    }
+
     private var sortedSamples: [BatteryHistorySample] {
         samples.sorted { $0.timestamp < $1.timestamp }
     }
@@ -258,11 +267,11 @@ struct DeviceHistoryChartCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(String(localized: "details.history.title"))
+                    Text(localized("details.history.title", zh: "电量历史", en: "Battery History"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.secondary)
 
-                    Text(String(localized: "details.history.subtitle"))
+                    Text(localized("details.history.subtitle", zh: "最近 24 小时", en: "Last 24 hours"))
                         .font(.system(size: 10.5))
                         .foregroundStyle(Color.secondary.opacity(0.8))
                 }
@@ -270,8 +279,8 @@ struct DeviceHistoryChartCard: View {
                 Spacer(minLength: 12)
 
                 HStack(spacing: 6) {
-                    historyChip(title: String(localized: "details.history.current"), value: "\(latestLevel)%")
-                    historyChip(title: String(localized: "details.history.range"), value: "\(minLevel)-\(maxLevel)%")
+                    historyChip(title: localized("details.history.current", zh: "当前", en: "Current"), value: "\(latestLevel)%")
+                    historyChip(title: localized("details.history.range", zh: "区间", en: "Range"), value: "\(minLevel)-\(maxLevel)%")
                 }
             }
 
