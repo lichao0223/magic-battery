@@ -34,6 +34,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        if RuntimeFlags.exportScreenshots {
+            NSApp.setActivationPolicy(.regular)
+            MockData.applyScreenshotDefaults()
+            Task {
+                do {
+                    let outputDir = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+                        .appendingPathComponent("docs/screenshots", isDirectory: true)
+                    try await ScreenshotExporter.exportAll(into: outputDir)
+                    AppLogger.info("Screenshot export completed", category: AppLogger.app)
+                } catch {
+                    AppLogger.error("Screenshot export failed: \(error.localizedDescription)", category: AppLogger.app)
+                }
+                NSApplication.shared.terminate(nil)
+            }
+            return
+        }
+
+        if RuntimeFlags.useMockData {
+            MockData.applyScreenshotDefaults()
+        }
+
         let showInDock = UserDefaults.standard.bool(forKey: "showInDock")
 
         // 设置应用为菜单栏应用（可选在 Dock 中显示）
@@ -52,9 +73,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupMenuBar()
         AppLogger.info("MenuBar setup complete", category: AppLogger.app)
 
-        // 请求通知权限
-        requestNotificationPermission()
-        AppLogger.info("Starting device monitoring...", category: AppLogger.app)
+        if !RuntimeFlags.useMockData {
+            // 请求通知权限
+            requestNotificationPermission()
+            AppLogger.info("Starting device monitoring...", category: AppLogger.app)
+        } else {
+            AppLogger.info("Starting in mock data mode", category: AppLogger.app)
+        }
 
         // 开始监控设备
         deviceManager?.startMonitoring()
@@ -64,6 +89,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 设置小组件数据同步
         setupWidgetDataSync()
+
+        // 记录设备电量历史
+        setupHistoryRecording()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -74,6 +102,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Setup
 
     private func setupDeviceManager() {
+        if RuntimeFlags.useMockData {
+            deviceManager = MockDeviceManager()
+            return
+        }
+
         // 创建各个设备管理器
         let macBatteryService = MacBatteryService()
         let bluetoothService = BluetoothDeviceService()
@@ -109,7 +142,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupNotificationMonitoring() {
-        guard let viewModel = viewModel else { return }
+        guard let viewModel = viewModel, !RuntimeFlags.useMockData else { return }
 
         // 监听设备变化，自动发送低电量通知
         viewModel.$devices
@@ -130,6 +163,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
             .sink { devices in
                 WidgetDataManager.shared.saveDevices(devices)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setupHistoryRecording() {
+        guard let viewModel = viewModel else { return }
+
+        viewModel.$devices
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+            .sink { devices in
+                Task {
+                    await BatteryHistoryStore.shared.record(devices: devices)
+                }
             }
             .store(in: &cancellables)
     }

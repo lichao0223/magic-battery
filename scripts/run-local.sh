@@ -6,6 +6,7 @@ DERIVED_DATA_PATH="${ROOT_DIR}/.build-local"
 SCHEME="battery"
 PROJECT_PATH="${ROOT_DIR}/battery.xcodeproj"
 APP_PATH="${DERIVED_DATA_PATH}/Build/Products/Debug/MagicBattery.app"
+APP_BIN="${APP_PATH}/Contents/MacOS/MagicBattery"
 ACTION="${1:-run}"
 
 build_app() {
@@ -42,6 +43,26 @@ launch_app() {
   open "${APP_PATH}"
 }
 
+run_mock_app() {
+  if [[ ! -x "${APP_BIN}" ]]; then
+    echo "App binary not found at ${APP_BIN}" >&2
+    exit 1
+  fi
+
+  osascript -e 'tell application "MagicBattery" to quit' >/dev/null 2>&1 || true
+  sleep 1
+  MAGIC_BATTERY_USE_MOCK_DATA=1 "${APP_BIN}"
+}
+
+export_screenshots() {
+  if [[ ! -x "${APP_BIN}" ]]; then
+    echo "App binary not found at ${APP_BIN}" >&2
+    exit 1
+  fi
+
+  MAGIC_BATTERY_EXPORT_SCREENSHOTS=1 "${APP_BIN}"
+}
+
 case "${ACTION}" in
   build)
     build_app
@@ -53,8 +74,16 @@ case "${ACTION}" in
     build_app
     launch_app
     ;;
+  mock)
+    build_app
+    run_mock_app
+    ;;
+  screenshots)
+    build_app
+    export_screenshots
+    ;;
   *)
-    echo "Usage: $0 [build|test|run]" >&2
+    echo "Usage: $0 [build|test|run|mock|screenshots]" >&2
     exit 1
     ;;
 esac

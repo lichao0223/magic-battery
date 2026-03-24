@@ -18,7 +18,18 @@
 "settings.notification.enable" = "启用低电量通知";
 "settings.notification.threshold" = "低电量阈值";
 "settings.notification.threshold.description" = "当设备电量低于此值时发送通知";
+"settings.notification.sound" = "通知声音";
+"settings.notification.sound.preview" = "试听声音";
+"settings.notification.sound.preview_unavailable" = "当前系统无法播放所选声音";
 "settings.notification.test" = "发送测试通知";
+"settings.notification.sound.default" = "系统默认";
+"settings.notification.sound.glass" = "Glass";
+"settings.notification.sound.hero" = "Hero";
+"settings.notification.sound.pop" = "Pop";
+"settings.notification.sound.purr" = "Purr";
+"settings.notification.sound.submarine" = "Submarine";
+"settings.notification.sound.basso" = "Basso";
+"settings.notification.sound.frog" = "Frog";
 
 // Update Section
 "settings.update.title" = "刷新频率";
