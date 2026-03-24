@@ -1,5 +1,61 @@
+import AppKit
 import Foundation
 import UserNotifications
+
+enum NotificationSoundOption: String, CaseIterable, Identifiable {
+    case systemDefault
+    case glass
+    case hero
+    case pop
+    case purr
+    case submarine
+    case basso
+    case frog
+
+    var id: String { rawValue }
+
+    var localizedTitle: String {
+        switch self {
+        case .systemDefault:
+            return String(localized: "settings.notification.sound.default")
+        case .glass:
+            return String(localized: "settings.notification.sound.glass")
+        case .hero:
+            return String(localized: "settings.notification.sound.hero")
+        case .pop:
+            return String(localized: "settings.notification.sound.pop")
+        case .purr:
+            return String(localized: "settings.notification.sound.purr")
+        case .submarine:
+            return String(localized: "settings.notification.sound.submarine")
+        case .basso:
+            return String(localized: "settings.notification.sound.basso")
+        case .frog:
+            return String(localized: "settings.notification.sound.frog")
+        }
+    }
+
+    var nsSoundName: NSSound.Name? {
+        switch self {
+        case .systemDefault:
+            return nil
+        case .glass:
+            return NSSound.Name("Glass")
+        case .hero:
+            return NSSound.Name("Hero")
+        case .pop:
+            return NSSound.Name("Pop")
+        case .purr:
+            return NSSound.Name("Purr")
+        case .submarine:
+            return NSSound.Name("Submarine")
+        case .basso:
+            return NSSound.Name("Basso")
+        case .frog:
+            return NSSound.Name("Frog")
+        }
+    }
+}
 
 /// 通知管理器
 /// 负责管理低电量通知和其他系统通知
@@ -17,6 +73,11 @@ final class NotificationManager: NSObject {
     private var lowBatteryThreshold: Int {
         let configured = UserDefaults.standard.integer(forKey: "lowBatteryThreshold")
         return configured > 0 ? configured : 20
+    }
+
+    private var notificationSoundOption: NotificationSoundOption {
+        let rawValue = UserDefaults.standard.string(forKey: "notificationSound") ?? NotificationSoundOption.systemDefault.rawValue
+        return NotificationSoundOption(rawValue: rawValue) ?? .systemDefault
     }
 
     // MARK: - Initialization
@@ -38,6 +99,10 @@ final class NotificationManager: NSObject {
     func checkAuthorizationStatus() async -> UNAuthorizationStatus {
         let settings = await notificationCenter.notificationSettings()
         return settings.authorizationStatus
+    }
+
+    func previewSelectedSound() -> Bool {
+        previewSound(notificationSoundOption)
     }
 
     /// 发送低电量通知
@@ -67,7 +132,7 @@ final class NotificationManager: NSObject {
         content.title = String(localized: "notification.title")
         content.subtitle = String(localized: "notification.low_battery.subtitle")
         content.body = String(format: String(localized: "notification.low_battery.body"), device.name, device.batteryLevel)
-        content.sound = .default
+        content.sound = notificationContentSound(for: notificationSoundOption)
         content.categoryIdentifier = "LOW_BATTERY"
         content.userInfo = ["deviceId": device.id.uuidString]
 
@@ -78,6 +143,7 @@ final class NotificationManager: NSObject {
         )
 
         do {
+            playAuxiliarySoundIfNeeded(option: notificationSoundOption)
             try await notificationCenter.add(request)
         } catch {
             // 发送失败需要回滚占位
@@ -142,7 +208,7 @@ final class NotificationManager: NSObject {
         content.title = String(localized: "notification.title")
         content.subtitle = String(localized: "notification.test.subtitle")
         content.body = String(localized: "notification.test.body")
-        content.sound = .default
+        content.sound = notificationContentSound(for: notificationSoundOption)
 
         let request = UNNotificationRequest(
             identifier: "test_notification",
@@ -151,6 +217,7 @@ final class NotificationManager: NSObject {
         )
 
         do {
+            playAuxiliarySoundIfNeeded(option: notificationSoundOption)
             try await notificationCenter.add(request)
             return .success
         } catch {
@@ -179,6 +246,30 @@ final class NotificationManager: NSObject {
 
         // 检查并发送新的低电量通知
         await checkAndNotifyLowBattery(for: devices)
+    }
+
+    private func notificationContentSound(for option: NotificationSoundOption) -> UNNotificationSound? {
+        switch option {
+        case .systemDefault:
+            return .default
+        default:
+            return nil
+        }
+    }
+
+    @discardableResult
+    private func previewSound(_ option: NotificationSoundOption) -> Bool {
+        guard let soundName = option.nsSoundName,
+              let sound = NSSound(named: soundName) else {
+            return false
+        }
+        sound.stop()
+        return sound.play()
+    }
+
+    private func playAuxiliarySoundIfNeeded(option: NotificationSoundOption) {
+        guard option != .systemDefault else { return }
+        _ = previewSound(option)
     }
 }
 

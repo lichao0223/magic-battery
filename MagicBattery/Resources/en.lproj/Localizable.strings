@@ -18,7 +18,18 @@
 "settings.notification.enable" = "Enable Low Battery Notifications";
 "settings.notification.threshold" = "Low Battery Threshold";
 "settings.notification.threshold.description" = "Send notification when device battery falls below this level";
+"settings.notification.sound" = "Notification Sound";
+"settings.notification.sound.preview" = "Preview Sound";
+"settings.notification.sound.preview_unavailable" = "Selected sound is unavailable on this system";
 "settings.notification.test" = "Send Test Notification";
+"settings.notification.sound.default" = "System Default";
+"settings.notification.sound.glass" = "Glass";
+"settings.notification.sound.hero" = "Hero";
+"settings.notification.sound.pop" = "Pop";
+"settings.notification.sound.purr" = "Purr";
+"settings.notification.sound.submarine" = "Submarine";
+"settings.notification.sound.basso" = "Basso";
+"settings.notification.sound.frog" = "Frog";
 
 // Update Section
 "settings.update.title" = "Refresh Rate";

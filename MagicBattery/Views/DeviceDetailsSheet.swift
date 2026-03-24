@@ -1,4 +1,5 @@
 import SwiftUI
+import Charts
 
 struct DeviceDetailsSheet: View {
     let device: Device
@@ -141,6 +142,10 @@ struct DeviceDetailsSheet: View {
                         inlineNote(text: errorMessage, tone: .orange)
                     }
 
+                    if !viewModel.historySamples.isEmpty {
+                        DeviceHistoryChartCard(samples: viewModel.historySamples)
+                    }
+
                     ForEach(snapshot.sections) { section in
                         DeviceDetailSectionCard(section: section)
                     }
@@ -227,6 +232,128 @@ struct DeviceDetailsSheet: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
             .batterySectionSurface(cornerRadius: 16)
+    }
+}
+
+private struct DeviceHistoryChartCard: View {
+    let samples: [BatteryHistorySample]
+
+    private var sortedSamples: [BatteryHistorySample] {
+        samples.sorted { $0.timestamp < $1.timestamp }
+    }
+
+    private var minLevel: Int {
+        sortedSamples.map(\.batteryLevel).min() ?? 0
+    }
+
+    private var maxLevel: Int {
+        sortedSamples.map(\.batteryLevel).max() ?? 0
+    }
+
+    private var latestLevel: Int {
+        sortedSamples.last?.batteryLevel ?? 0
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("details.history.title")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Color.secondary)
+
+                    Text("details.history.subtitle")
+                        .font(.system(size: 10.5))
+                        .foregroundStyle(Color.secondary.opacity(0.8))
+                }
+
+                Spacer(minLength: 12)
+
+                HStack(spacing: 6) {
+                    historyChip(title: String(localized: "details.history.current"), value: "\(latestLevel)%")
+                    historyChip(title: String(localized: "details.history.range"), value: "\(minLevel)-\(maxLevel)%")
+                }
+            }
+
+            Chart(sortedSamples) { sample in
+                AreaMark(
+                    x: .value("Time", sample.timestamp),
+                    y: .value("Battery", sample.batteryLevel)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.cyan.opacity(0.26), Color.cyan.opacity(0.02)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .interpolationMethod(.catmullRom)
+
+                LineMark(
+                    x: .value("Time", sample.timestamp),
+                    y: .value("Battery", sample.batteryLevel)
+                )
+                .foregroundStyle(Color.cyan)
+                .lineStyle(StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
+                .interpolationMethod(.catmullRom)
+
+                if sample.isCharging {
+                    PointMark(
+                        x: .value("Time", sample.timestamp),
+                        y: .value("Battery", sample.batteryLevel)
+                    )
+                    .symbol(.circle)
+                    .symbolSize(36)
+                    .foregroundStyle(Color.orange)
+                }
+            }
+            .chartYScale(domain: 0...100)
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 4)) { value in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
+                        .foregroundStyle(Color.white.opacity(0.10))
+                    AxisTick(stroke: StrokeStyle(lineWidth: 0.5))
+                        .foregroundStyle(Color.white.opacity(0.18))
+                    AxisValueLabel(format: .dateTime.hour().minute())
+                        .font(.system(size: 9.5))
+                        .foregroundStyle(Color.secondary)
+                }
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading, values: [0, 25, 50, 75, 100]) { value in
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
+                        .foregroundStyle(Color.white.opacity(0.10))
+                    AxisValueLabel {
+                        if let intValue = value.as(Int.self) {
+                            Text("\(intValue)%")
+                                .font(.system(size: 9.5))
+                                .foregroundStyle(Color.secondary)
+                        }
+                    }
+                }
+            }
+            .frame(height: 148)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .batteryCardSurface(cornerRadius: 22, tint: Color.white.opacity(0.04))
+    }
+
+    private func historyChip(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.system(size: 9.5, weight: .medium))
+                .foregroundStyle(Color.secondary)
+            Text(value)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Color.primary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.white.opacity(0.06))
+        )
     }
 }
 

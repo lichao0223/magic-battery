@@ -89,6 +89,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 设置小组件数据同步
         setupWidgetDataSync()
+
+        // 记录设备电量历史
+        setupHistoryRecording()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -160,6 +163,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
             .sink { devices in
                 WidgetDataManager.shared.saveDevices(devices)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setupHistoryRecording() {
+        guard let viewModel = viewModel else { return }
+
+        viewModel.$devices
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+            .sink { devices in
+                Task {
+                    await BatteryHistoryStore.shared.record(devices: devices)
+                }
             }
             .store(in: &cancellables)
     }

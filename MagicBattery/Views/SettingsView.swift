@@ -5,6 +5,7 @@ import ServiceManagement
 struct SettingsView: View {
     @AppStorage("enableNotifications") private var enableNotifications = true
     @AppStorage("lowBatteryThreshold") private var lowBatteryThreshold = 20
+    @AppStorage("notificationSound") private var notificationSound = NotificationSoundOption.systemDefault.rawValue
     @AppStorage("updateInterval") private var updateInterval = 60
     @AppStorage("bleScanInterval") private var bleScanInterval = 120
     @AppStorage("showInDock") private var showInDock = false
@@ -34,6 +35,10 @@ struct SettingsView: View {
         case 2: return .dark
         default: return nil
         }
+    }
+
+    private var selectedNotificationSound: NotificationSoundOption {
+        NotificationSoundOption(rawValue: notificationSound) ?? .systemDefault
     }
 
 
@@ -145,6 +150,38 @@ struct SettingsView: View {
                     Text("settings.notification.threshold.description")
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("settings.notification.sound")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.primary.opacity(0.85))
+
+                    Picker("settings.notification.sound", selection: $notificationSound) {
+                        ForEach(NotificationSoundOption.allCases) { option in
+                            Text(option.localizedTitle).tag(option.rawValue)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+
+                    HStack(spacing: 8) {
+                        Text(selectedNotificationSound.localizedTitle)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Color.secondary)
+
+                        Spacer()
+
+                        Button(action: {
+                            let played = NotificationManager.shared.previewSelectedSound()
+                            if !played && selectedNotificationSound != .systemDefault {
+                                testNotificationMessage = String(localized: "settings.notification.sound.preview_unavailable")
+                            }
+                        }) {
+                            Label("settings.notification.sound.preview", systemImage: "speaker.wave.2")
+                        }
+                        .batterySecondaryControlStyle()
+                    }
                 }
             }
 
@@ -380,6 +417,7 @@ struct SettingsView: View {
     private func resetToDefaults() {
         enableNotifications = true
         lowBatteryThreshold = 20
+        notificationSound = NotificationSoundOption.systemDefault.rawValue
         updateInterval = 60
         bleScanInterval = 120
         showInDock = false

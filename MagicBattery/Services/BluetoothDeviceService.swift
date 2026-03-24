@@ -215,7 +215,9 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
                 type: accessory.type,
                 batteryLevel: accessory.batteryLevel,
                 isCharging: false,
-                lastUpdated: Date()
+                lastUpdated: Date(),
+                externalIdentifier: accessory.uniqueKey,
+                parentExternalIdentifier: accessory.parentUniqueKey
             )
             mergedDevices.append(device)
             seenIDs.insert(id)
@@ -548,26 +550,71 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
                 ?? String(localized: "device.bluetooth_device_fallback")
             let normalizedName = normalizeDeviceName(name)
             let type = determineDeviceType(fromName: name)
-            let battery = registryInt(entry, key: "BatteryPercent")
-                ?? registryInt(entry, key: "BatteryPercentSingle")
-                ?? registryInt(entry, key: "BatteryLevel")
-                ?? registryInt(entry, key: "Battery")
-                ?? -1
             let uniqueKey = registryString(entry, key: "SerialNumber")
                 ?? registryString(entry, key: "DeviceAddress")
                 ?? normalizedName
             let isBuiltIn = registryBool(entry, key: "Built-In")
 
+            let properties = registryProperties(entry)
+            let componentLevels = extractBatteryComponentLevels(from: properties)
+
             if !isBuiltIn {
-                accessories.append(
-                    RegistryAccessory(
-                        uniqueKey: uniqueKey,
-                        name: name,
-                        normalizedName: normalizedName,
-                        batteryLevel: max(-1, min(100, battery)),
-                        type: type
+                if type == .airPods, componentLevels.hasSplitValues {
+                    if let left = componentLevels.left {
+                        accessories.append(
+                            RegistryAccessory(
+                                uniqueKey: "\(uniqueKey)::left",
+                                name: "\(name) · \(String(localized: "device.type.airpods_left"))",
+                                normalizedName: normalizedName,
+                                batteryLevel: left,
+                                type: .airPodsLeft,
+                                parentUniqueKey: uniqueKey
+                            )
+                        )
+                    }
+                    if let right = componentLevels.right {
+                        accessories.append(
+                            RegistryAccessory(
+                                uniqueKey: "\(uniqueKey)::right",
+                                name: "\(name) · \(String(localized: "device.type.airpods_right"))",
+                                normalizedName: normalizedName,
+                                batteryLevel: right,
+                                type: .airPodsRight,
+                                parentUniqueKey: uniqueKey
+                            )
+                        )
+                    }
+                    if let chargingCase = componentLevels.caseLevel {
+                        accessories.append(
+                            RegistryAccessory(
+                                uniqueKey: "\(uniqueKey)::case",
+                                name: "\(name) · \(String(localized: "device.type.airpods_case"))",
+                                normalizedName: normalizedName,
+                                batteryLevel: chargingCase,
+                                type: .airPodsCase,
+                                parentUniqueKey: uniqueKey
+                            )
+                        )
+                    }
+                } else {
+                    let battery = componentLevels.overall
+                        ?? registryInt(entry, key: "BatteryPercent")
+                        ?? registryInt(entry, key: "BatteryPercentSingle")
+                        ?? registryInt(entry, key: "BatteryLevel")
+                        ?? registryInt(entry, key: "Battery")
+                        ?? -1
+
+                    accessories.append(
+                        RegistryAccessory(
+                            uniqueKey: uniqueKey,
+                            name: name,
+                            normalizedName: normalizedName,
+                            batteryLevel: max(-1, min(100, battery)),
+                            type: type,
+                            parentUniqueKey: nil
+                        )
                     )
-                )
+                }
             }
 
             entry = IOIteratorNext(iterator)
@@ -601,6 +648,65 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
             return number.boolValue
         }
         return false
+    }
+
+    private func registryProperties(_ entry: io_registry_entry_t) -> [String: Any] {
+        var unmanagedProps: Unmanaged<CFMutableDictionary>?
+        let kr = IORegistryEntryCreateCFProperties(entry, &unmanagedProps, kCFAllocatorDefault, 0)
+        guard kr == KERN_SUCCESS, let props = unmanagedProps?.takeRetainedValue() as? [String: Any] else {
+            return [:]
+        }
+        return props
+    }
+
+    private func extractBatteryComponentLevels(from dict: [String: Any]) -> BatteryComponentLevels {
+        BatteryComponentLevels(
+            overall: extractBatteryLevel(from: dict, keys: [
+                "BatteryPercent",
+                "BatteryPercentSingle",
+                "BatteryLevel",
+                "Battery",
+                "DeviceBatteryLevel",
+                "batteryLevel",
+                "battery_percent"
+            ]),
+            left: extractBatteryLevel(from: dict, keys: [
+                "BatteryPercentLeft",
+                "LeftBatteryPercent",
+                "LeftBatteryLevel",
+                "BatteryLeft",
+                "BatteryLevelLeft"
+            ]),
+            right: extractBatteryLevel(from: dict, keys: [
+                "BatteryPercentRight",
+                "RightBatteryPercent",
+                "RightBatteryLevel",
+                "BatteryRight",
+                "BatteryLevelRight"
+            ]),
+            caseLevel: extractBatteryLevel(from: dict, keys: [
+                "BatteryPercentCase",
+                "CaseBatteryPercent",
+                "CaseBatteryLevel",
+                "BatteryCase",
+                "BatteryLevelCase"
+            ])
+        )
+    }
+
+    private func extractBatteryLevel(from dict: [String: Any], keys: [String]) -> Int? {
+        for key in keys {
+            if let value = dict[key], let level = intValue(from: value) {
+                return level
+            }
+        }
+
+        for value in dict.values {
+            if let subDict = value as? [String: Any], let nested = extractBatteryLevel(from: subDict, keys: keys) {
+                return nested
+            }
+        }
+        return nil
     }
 
     private func normalizeDeviceName(_ name: String) -> String {
@@ -897,7 +1003,14 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
         usagePairs: [(usagePage: Int, usage: Int)] = [],
         classHint: DeviceType? = nil
     ) -> (type: DeviceType, source: String) {
-        _ = name
+        let normalizedName = normalizeDeviceName(name)
+
+        if normalizedName.contains("airpods") {
+            return (.airPods, "name_airpods")
+        }
+        if normalizedName.contains("beats") || normalizedName.contains("buds") {
+            return (.bluetoothHeadphone, "name_headphone")
+        }
 
         // 优先级 1：HID UsagePairs（协议级）
         if !usagePairs.isEmpty {
@@ -1111,6 +1224,18 @@ private struct RegistryAccessory {
     let normalizedName: String
     let batteryLevel: Int
     let type: DeviceType
+    let parentUniqueKey: String?
+}
+
+private struct BatteryComponentLevels {
+    let overall: Int?
+    let left: Int?
+    let right: Int?
+    let caseLevel: Int?
+
+    var hasSplitValues: Bool {
+        left != nil || right != nil || caseLevel != nil
+    }
 }
 
 // MARK: - CBCentralManagerDelegate
