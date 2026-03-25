@@ -121,25 +121,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned Features
+### Added
 
-- Real Bluetooth device battery level detection
-- AirPods individual earbud support
-- Battery history and charts
-- Custom notification sounds
-- Dark mode optimization
-- Multi-language support (English, Chinese)
-- Data export functionality
-- Cloud sync capabilities
+- Battery history persistence and a 24-hour chart in device details
+- Custom notification sound selection and preview support
+- Appearance mode setting with system / light / dark options
+- Mock screenshot export workflow for README assets
+- Additional parsing coverage for AirPods-related Bluetooth data
 
-### Planned Improvements
+### Changed
 
-- Complete unit test coverage
-- UI tests
-- Integration tests
-- Widget performance optimization
-- Battery trend analysis
-- Apple Watch companion app
+- Refreshed README screenshots and aligned documentation with the current feature set
+- Improved local unsigned build / test workflow portability
+- Polished device details history presentation and recent settings UI
+
+### Fixed
+
+- Reduced machine-specific signing assumptions for local development
+- Refined `system_profiler` parsing to avoid inventing missing AirPods case battery values
+
+### Remaining Roadmap
+
+- AirPods individual earbud / charging case battery presentation
+- More complete unit, integration, and UI test coverage
+- Widget performance optimization and richer battery trend analysis
+- Data export and cloud sync exploration
 
 ---
 
