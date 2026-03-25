@@ -48,6 +48,7 @@ enum ScreenshotExporter {
         let hosted = view
             .frame(width: size.width, height: size.height)
             .environment(\.colorScheme, .dark)
+            .environment(\.locale, Locale(identifier: "zh-Hans"))
 
         let renderer = ImageRenderer(content: hosted)
         renderer.scale = 2
@@ -363,7 +364,7 @@ private struct MockDeviceDetailsView: View {
 
             Spacer()
 
-            Text("README Screenshot")
+            Text("文档预览")
                 .font(.system(size: 11, weight: .semibold))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)

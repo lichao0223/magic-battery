@@ -25,7 +25,7 @@ enum MockData {
             lastUpdated: now.addingTimeInterval(-45),
             externalIdentifier: "00008140-0012345678901234",
             source: .libimobiledeviceNetwork,
-            detailText: "同一 Wi‑Fi 下在线"
+            detailText: "同一无线网络在线"
         ),
         Device(
             id: UUID(uuidString: "C3333333-3333-3333-3333-333333333333")!,
@@ -95,7 +95,7 @@ enum MockData {
 
     static var detailSnapshot: DeviceDetailSnapshot {
         DeviceDetailSnapshot(
-            subtitle: "iPhone 16 Pro · Wi‑Fi 同步",
+            subtitle: "老板的手机 · 无线同步",
             sections: [
                 DeviceDetailSection(
                     id: "current",
@@ -113,7 +113,7 @@ enum MockData {
                     title: "电池健康",
                     items: [
                         DeviceDetailItem(id: "cycle", title: "循环次数", value: "186"),
-                        DeviceDetailItem(id: "health", title: "健康估算", value: "92%", detail: "基于设计容量与当前容量的 Mock 估算值"),
+                        DeviceDetailItem(id: "health", title: "健康估算", value: "92%", detail: "基于设计容量与当前容量的模拟估算值"),
                         DeviceDetailItem(id: "design", title: "设计容量", value: "3274 mAh"),
                         DeviceDetailItem(id: "nominal", title: "当前容量", value: "3010 mAh")
                     ]
@@ -180,4 +180,5 @@ enum MockData {
         defaults.set(true, forKey: "showOfflineIDevices")
         defaults.set(2, forKey: "appearanceMode")
     }
+}
 }

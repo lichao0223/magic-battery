@@ -237,9 +237,11 @@ struct DeviceDetailsSheet: View {
 
 struct DeviceHistoryChartCard: View {
     let samples: [BatteryHistorySample]
+    @Environment(\.locale) private var locale
 
     private var isChineseLocale: Bool {
-        Locale.preferredLanguages.first?.lowercased().hasPrefix("zh") == true
+        locale.identifier.lowercased().hasPrefix("zh")
+            || Locale.preferredLanguages.first?.lowercased().hasPrefix("zh") == true
     }
 
     private func localized(_ key: String, zh: String, en: String) -> String {
