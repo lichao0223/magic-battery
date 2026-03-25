@@ -81,6 +81,7 @@ case "${ACTION}" in
   screenshots)
     build_app
     export_screenshots
+    "${ROOT_DIR}/scripts/prepare-readme-screenshots.sh"
     ;;
   *)
     echo "Usage: $0 [build|test|run|mock|screenshots]" >&2

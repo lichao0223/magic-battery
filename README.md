@@ -30,9 +30,12 @@
 - ✅ 监控已信任的 iPhone / iPad 电池状态（需 USB 连接或同一 Wi-Fi）
 - ✅ 菜单栏显示电池图标和电量
 - ✅ 低电量自动通知提醒
+- ✅ 自定义通知声音
 - ✅ 设备列表排序和筛选
+- ✅ 设备详情页与最近 24 小时电量历史图表
 - ✅ 小组件支持（小、中、大三种尺寸）
 - ✅ 中英文双语支持
+- ✅ 浅色 / 深色 / 跟随系统外观
 
 ### 技术特性
 - 🏗️ MVVM 架构设计
@@ -188,7 +191,9 @@ cd battery
 ./scripts/run-local.sh screenshots
 ```
 
-导出的原始 PNG 默认位于 `docs/screenshots/`；README 中使用的是额外裁剪/缩放后的 `*-readme.png` 版本。
+该命令会同时：
+- 重新导出 `docs/screenshots/` 下的原始截图
+- 同步刷新 README 使用的 `*-readme.png` 缩放图
 
 **Xcode / 已配置 Team 的签名构建**
 
@@ -273,14 +278,17 @@ xcodebuild -scheme battery -configuration Release -allowProvisioningUpdates
 - **通知设置**
   - 启用/禁用低电量通知
   - 设置低电量阈值（10%-50%）
+  - 选择通知声音
   - 发送测试通知
 
 - **更新设置**
   - 设置更新间隔（30-300秒）
+  - 设置蓝牙补充扫描间隔
 
 - **应用设置**
   - 在 Dock 中显示/隐藏
   - 登录时启动
+  - 选择外观模式（跟随系统 / 浅色 / 深色）
 
 ### 小组件
 
@@ -331,6 +339,13 @@ xcodebuild -scheme battery -configuration Release -allowProvisioningUpdates
 - 低电量提醒
 - 通知去重
 - 前台显示支持
+- 自定义通知声音与试听
+
+#### BatteryHistoryStore
+持久化设备电量历史：
+- 记录最近采样结果
+- 为设备详情页提供最近 24 小时趋势数据
+- 与主应用 / 小组件共享一致的数据来源
 
 ### 测试
 
@@ -349,6 +364,7 @@ xcodebuild test -scheme battery -destination 'platform=macOS'
 - Codable 编解码与向后兼容
 - IDeviceTool 枚举与错误描述
 - 蓝牙设备去重逻辑
+- system_profiler 蓝牙解析与 AirPods 组件信息提取
 
 ## 已知问题
 
@@ -356,15 +372,22 @@ xcodebuild test -scheme battery -destination 'platform=macOS'
    - 并非所有蓝牙设备都通过 HID 属性暴露电池电量
    - 不支持 BLE GATT Battery Service 的设备会显示为"电量未知"
 
-2. **AirPods 左右耳机独立电量**
-   - 目前 AirPods 显示为单一设备
-   - 左右耳机和充电盒独立电量的获取需要私有 API 支持
+2. **AirPods 左右耳机 / 充电盒独立电量仍未完整落地**
+   - 当前已具备 AirPods 相关类型与部分解析能力
+   - 但最终展示仍以聚合设备为主，未稳定提供左右耳机与充电盒三路独立电量
 
-## 未来计划
+## 近期已完成
+
+- [x] 添加设备详情页中的最近 24 小时电量历史记录与图表
+- [x] 支持自定义通知声音与测试播放
+- [x] 支持浅色 / 深色 / 跟随系统外观
+- [x] 刷新 README 使用的 Mock 截图导出流程
+
+## 后续计划
 
 - [ ] 支持 AirPods 左右耳机 / 充电盒独立电量显示
-- [ ] 添加电量历史记录和图表
-- [ ] 支持自定义通知声音
+- [ ] 继续补充单元测试、集成测试与 UI 测试覆盖
+- [ ] 优化 Widget 刷新与设备趋势分析体验
 
 ## 贡献
 
