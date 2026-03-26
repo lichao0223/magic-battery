@@ -1,175 +1,101 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+This file records notable product-facing changes for MagicBattery.
+It focuses on visible features, behavior changes, fixes, and known issues.
+
+本文档记录 MagicBattery 面向用户可感知的版本变化，重点描述功能新增、体验变化、问题修复与已知限制。
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [0.0.1] - 2026-03-05
-
-### Added
-
-#### Core Features
-- Mac battery monitoring with real-time updates
-- Bluetooth device battery monitoring (keyboard, mouse, headphones, AirPods)
-- Menu bar icon with battery status display
-- Low battery notifications with customizable threshold
-- Device list with sorting and filtering options
-- Widget support (small, medium, large sizes)
-
-#### Models
-- `Device` struct with battery level clamping (0-100)
-- `DeviceType` enum with 11 device types and Chinese display names
-- `DeviceIcon` enum mapping to SF Symbols
-- Computed properties: `batteryColor`, `isLowBattery`, `icon`
-
-#### Services
-- `DeviceManager` protocol for device management abstraction
-- `MacBatteryService` using IOKit for Mac battery monitoring
-- `BluetoothDeviceService` using IOBluetooth for BT device monitoring
-- `CompositeDeviceManager` for aggregating multiple device managers
-- `NotificationManager` for system notifications with deduplication
-- `PermissionManager` for unified permission handling
-- `ErrorHandler` for centralized error management
-- `PerformanceMonitor` for tracking operation execution times
-- `MemoryMonitor` for memory usage tracking
-
-#### ViewModels
-- `DeviceListViewModel` with MVVM architecture
-- Reactive updates using Combine framework
-- Sorting options: battery level, name, last updated, device type
-- Filtering options: all, low battery, charging, by type
-
-#### Views
-- `MenuBarManager` for status bar icon and popover management
-- `MenuBarPopoverView` with device list display
-- `DeviceRowView` for individual device information
-- `SettingsView` with notification, update, and app preferences
-- `PermissionRequestView` for onboarding and permission requests
-- `BatteryIconView` for visual battery level representation
-
-#### Widgets
-- `BatteryWidget` with three size variants
-- `BatteryWidgetProvider` for timeline management
-- `WidgetDataManager` for App Group data sharing
-- Automatic updates every 5 minutes
-
-#### Testing
-- Unit tests for Device model
-- Battery level validation tests
-- Device type and icon mapping tests
-- Computed properties tests
-
-#### Documentation
-- Comprehensive README.md
-- PROJECT_SUMMARY.md with implementation details
-- DEVELOPMENT.md with development guidelines
-- CHANGELOG.md for version tracking
-
-### Technical Highlights
-
-#### Architecture
-- MVVM pattern with clear separation of concerns
-- Protocol-oriented design for flexibility
-- Service layer for business logic isolation
-
-#### Performance
-- Device information caching using NSCache
-- Performance monitoring and statistics
-- Memory usage tracking
-- Operation execution time measurement
-
-#### Error Handling
-- Centralized error management system
-- Error logging with severity levels
-- Automatic error notifications for critical issues
-- Comprehensive error types
-
-#### Data Persistence
-- UserDefaults for device ID storage
-- App Group for widget data sharing
-- JSON encoding/decoding for device data
-
-### Known Limitations
-
-- Bluetooth device battery level returns fixed value (100%)
-- AirPods individual earbud battery levels not supported
-- Limited test coverage (only Model layer)
-
-### Dependencies
-
-- Swift 5.9+
-- SwiftUI
-- Combine
-- WidgetKit
-- IOKit
-- IOBluetooth
-- UserNotifications
-
-### System Requirements
-
-- macOS 15.6 or later
-- Xcode 26.0 or later
-
-### Permissions Required
-
-- Notification permission (required)
-- Bluetooth permission (required)
-- Accessibility permission (optional)
+and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
 ## [Unreleased]
 
-### Added
+### Added / 新增功能
 
-- Battery history persistence and a 24-hour chart in device details
-- Custom notification sound selection and preview support
-- Appearance mode setting with system / light / dark options
-- Mock screenshot export workflow for README assets
-- Additional parsing coverage for AirPods-related Bluetooth data
+- Battery history persistence with a 24-hour trend chart in device details.
+- Custom notification sound selection and preview.
+- Appearance mode setting with system / light / dark options.
+- Better support for AirPods-related battery parsing scenarios.
 
-### Changed
+- 新增电池历史记录能力，并在设备详情中支持 24 小时趋势图展示。
+- 新增通知声音选择与预览功能。
+- 新增系统 / 浅色 / 深色外观模式设置。
+- 增强了 AirPods 相关电量解析场景的支持。
 
-- Refreshed README screenshots and aligned documentation with the current feature set
-- Improved local unsigned build / test workflow portability
-- Polished device details history presentation and recent settings UI
+### Changed / 功能与体验调整
 
-### Fixed
+- Refreshed README screenshots and aligned product documentation with the current UI.
+- Improved device details history presentation and refined recent settings interactions.
 
-- Reduced machine-specific signing assumptions for local development
-- Refined `system_profiler` parsing to avoid inventing missing AirPods case battery values
+- 更新了 README 截图，并使文档内容与当前界面保持一致。
+- 优化了设备详情页中的历史信息展示，并调整了近期设置项的交互体验。
 
-### Remaining Roadmap
+### Fixed / 问题修复
 
-- AirPods individual earbud / charging case battery presentation
-- More complete unit, integration, and UI test coverage
-- Widget performance optimization and richer battery trend analysis
-- Data export and cloud sync exploration
+- Improved local build / run portability for development environments.
+- Refined AirPods-related parsing to avoid inventing missing charging case battery values.
 
----
+- 改善了本地构建与运行流程的兼容性。
+- 修正了 AirPods 相关解析逻辑，避免在缺失数据时错误推断充电盒电量。
 
-## Version History
+### Known Issues / 已知问题
 
-- **0.0.1** (2026-03-05) - Initial release
+- AirPods individual earbud / charging case presentation still needs improvement in some scenarios.
+- Widget performance and battery trend presentation can be further optimized.
+- Data export and cloud sync are not yet available.
 
----
-
-## Git Commit History
-
-```
-f1aff58 - docs: add comprehensive documentation
-a3196f2 - feat: implement widget support
-5e04644 - feat: add error handling and performance monitoring
-e6fb503 - feat: implement permission management system
-92da512 - feat: implement menu bar UI and app integration
-ef8dfce - feat: implement NotificationManager
-b358796 - feat: implement DeviceListViewModel
-b468036 - feat: implement device management services
-5308a1c - feat: add Device and DeviceType models with tests
-7ea0a16 - Initial Commit
-```
+- 在部分场景下，AirPods 单耳 / 充电盒电量展示仍有待继续完善。
+- 小组件性能与电量趋势展示仍有进一步优化空间。
+- 数据导出与云同步能力尚未提供。
 
 ---
 
-For more details, see the [README](README.md) and [PROJECT_SUMMARY](PROJECT_SUMMARY.md).
+## [0.0.1] - 2026-03-05
+
+### Added / 新增功能
+
+- Real-time Mac battery monitoring.
+- Bluetooth battery monitoring for common devices such as keyboards, mice, headphones, and AirPods.
+- Menu bar status display with quick access to battery information.
+- Low battery notifications with configurable threshold.
+- Device list with sorting and filtering support.
+- Home screen / desktop widget support in multiple sizes.
+
+- 支持 Mac 本机电池实时监控。
+- 支持常见蓝牙设备电量监控，包括键盘、鼠标、耳机和 AirPods。
+- 提供菜单栏常驻入口，方便快速查看电量状态。
+- 提供可配置阈值的低电量通知提醒。
+- 提供支持排序与筛选的设备列表。
+- 提供多尺寸电池小组件展示能力。
+
+### Changed / 功能与体验调整
+
+- Established the first usable product flow for battery monitoring and quick viewing.
+- Consolidated battery information into a lightweight menu bar experience.
+
+- 建立了首个可用的电量监控与查看流程。
+- 将电量信息整合为轻量的菜单栏查看体验。
+
+### Fixed / 问题修复
+
+- Initial release; no standalone fix-only items were called out for this version.
+
+- 初始版本发布，本版本未单独列出仅修复类事项。
+
+### Known Issues / 已知问题
+
+- Some Bluetooth devices may report incomplete or unavailable battery values.
+- AirPods individual earbud / charging case battery details are still limited.
+- The first release focuses on core usability and will continue to be refined in later versions.
+
+- 部分蓝牙设备的电量值可能不完整，或系统无法提供。
+- AirPods 单耳与充电盒电量细节支持仍然有限。
+- 首个版本以“先可用”为主，后续还会继续优化体验。
+
+---
+
+## Version History / 版本历史
+
+- **0.0.1** (2026-03-05) - Initial release / 首个可运行版本
