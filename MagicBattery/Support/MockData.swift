@@ -18,7 +18,7 @@ enum MockData {
         ),
         Device(
             id: UUID(uuidString: "B2222222-2222-2222-2222-222222222222")!,
-            name: "iPhone 16 Pro",
+            name: "老板的手机",
             type: .iPhone,
             batteryLevel: 61,
             isCharging: false,
@@ -132,15 +132,15 @@ enum MockData {
                     id: "meta",
                     title: "设备信息",
                     items: [
-                        DeviceDetailItem(id: "name", title: "设备名称", value: "老板的 iPhone 16 Pro"),
+                        DeviceDetailItem(id: "name", title: "设备名称", value: "老板的手机"),
                         DeviceDetailItem(id: "product", title: "机型", value: "iPhone17,1"),
                         DeviceDetailItem(id: "system", title: "系统版本", value: "iOS 18.4"),
-                        DeviceDetailItem(id: "connection", title: "连接方式", value: "同一 Wi‑Fi"),
+                        DeviceDetailItem(id: "connection", title: "连接方式", value: "同一无线网络"),
                         DeviceDetailItem(id: "identifier", title: "标识符", value: "00008140-0012345678901234")
                     ]
                 )
             ],
-            footnote: "这是 README 截图使用的 Mock 数据，用于稳定展示界面效果。"
+            footnote: "这是 README 截图使用的模拟数据，用于稳定展示界面效果。"
         )
     }
 
@@ -180,5 +180,4 @@ enum MockData {
         defaults.set(true, forKey: "showOfflineIDevices")
         defaults.set(2, forKey: "appearanceMode")
     }
-}
 }
