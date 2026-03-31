@@ -268,11 +268,29 @@ final class BluetoothDeviceService: NSObject, DeviceManager {
             classHintsByNormalizedName: classHintsByName,
             typeOverridesByNormalizedName: typeOverridesByName
         )
+        let filteredDevices = filterRedundantAirPodsAggregate(in: dedupedDevices)
 
-        let summary = dedupedDevices.map { "\($0.name):\($0.batteryLevel)" }.joined(separator: ", ")
-        debugLog("[BluetoothDeviceService] registry=\(registryAccessories.count) ble=\(batteryByBLENameSnapshot.count) hid=\(hidResult.devices.count) merged=\(mergedDevices.count) deduped=\(dedupedDevices.count) [\(summary)]")
+        let summary = filteredDevices.map { "\($0.name):\($0.batteryLevel)" }.joined(separator: ", ")
+        debugLog("[BluetoothDeviceService] registry=\(registryAccessories.count) ble=\(batteryByBLENameSnapshot.count) hid=\(hidResult.devices.count) merged=\(mergedDevices.count) deduped=\(dedupedDevices.count) filtered=\(filteredDevices.count) [\(summary)]")
 
-        return dedupedDevices
+        return filteredDevices
+    }
+
+    private func filterRedundantAirPodsAggregate(in devices: [Device]) -> [Device] {
+        let splitParents = Set(
+            devices
+                .filter { $0.type == .airPodsLeft || $0.type == .airPodsRight || $0.type == .airPodsCase }
+                .map { normalizeDeviceName($0.name.components(separatedBy: " · ").first ?? $0.name) }
+        )
+
+        guard !splitParents.isEmpty else { return devices }
+
+        return devices.filter { device in
+            guard device.type == .airPods else { return true }
+            let normalized = normalizeDeviceName(device.name)
+            // 已经有左右耳/充电盒明细时，移除同名聚合 AirPods 条目，避免重复显示“未知电量”
+            return !splitParents.contains(normalized)
+        }
     }
 
     private func dedupeDevices(

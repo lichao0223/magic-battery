@@ -89,7 +89,7 @@ final class NotificationManager: NSObject {
 
     // MARK: - Public Methods
 
-    /// 请求通知权限
+    /// 请求通知权限（直接调用系统授权弹窗）
     func requestAuthorization() async throws -> Bool {
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
         return try await notificationCenter.requestAuthorization(options: options)
@@ -99,6 +99,29 @@ final class NotificationManager: NSObject {
     func checkAuthorizationStatus() async -> UNAuthorizationStatus {
         let settings = await notificationCenter.notificationSettings()
         return settings.authorizationStatus
+    }
+
+    /// 确保已经进行过一次通知权限请求
+    /// - Returns: 当前是否具备发送通知的权限
+    func ensureAuthorization() async -> Bool {
+        let settings = await notificationCenter.notificationSettings()
+
+        switch settings.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return true
+        case .denied:
+            // 用户已明确拒绝，只能引导去系统设置手动开启
+            return false
+        case .notDetermined:
+            do {
+                return try await requestAuthorization()
+            } catch {
+                AppLogger.error("请求通知权限失败: \(error.localizedDescription)", category: AppLogger.notification)
+                return false
+            }
+        @unknown default:
+            return false
+        }
     }
 
     func previewSelectedSound() -> Bool {
@@ -198,8 +221,8 @@ final class NotificationManager: NSObject {
 
     /// 发送测试通知
     func sendTestNotification() async -> TestNotificationResult {
-        let status = await notificationCenter.notificationSettings().authorizationStatus
-        guard status == .authorized else {
+        // 优先确保已经完成过一次授权请求
+        guard await ensureAuthorization() else {
             AppLogger.warning("通知权限未授予，无法发送测试通知", category: AppLogger.notification)
             return .permissionDenied
         }

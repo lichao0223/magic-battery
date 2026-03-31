@@ -149,7 +149,7 @@ final class DeviceListViewModel: ObservableObject {
         switch device.type {
         case .mac:
             return .local
-        case .iPhone, .iPad, .appleWatch:
+        case .iPhone, .iPad, .appleWatch, .airPods, .airPodsLeft, .airPodsRight, .airPodsCase:
             return .appleDevices
         default:
             return .accessories
