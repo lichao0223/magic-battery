@@ -134,21 +134,39 @@ MagicBattery/
 
 ### 解除 macOS 安全限制
 
-由于应用未经 Apple 签名，macOS 会阻止打开。以下任一方式均可解决：
+由于应用当前**未做 Apple Developer 签名 / 公证（Notarization）**，macOS 可能会在首次打开时给出以下提示之一：
+
+- “MagicBattery 已损坏，无法打开。你应该将它移到废纸篓。”
+- “MagicBattery cannot be opened because Apple cannot check it for malicious software.”
+- “MagicBattery 已被阻止打开，因为它不是来自已识别的开发者。”
+
+这通常不是应用文件真的损坏，而是 **Gatekeeper** 因为未签名或未公证而拦截。以下任一方式通常都能解决：
 
 **方式一：右键打开（推荐）**
 
-右键点击 MagicBattery.app → 选择"打开" → 在弹窗中点击"打开"。仅首次需要，之后可正常双击启动。
+右键点击 `MagicBattery.app` → 选择“打开” → 在弹窗中再次点击“打开”。仅首次需要，之后一般可正常双击启动。
 
 **方式二：系统设置放行**
 
-打开"系统设置 → 隐私与安全性"，底部会显示"MagicBattery 已被阻止"，点击"仍要打开"。
+打开“系统设置 → 隐私与安全性”，底部如果出现“MagicBattery 已被阻止”相关提示，点击“仍要打开”。
 
 **方式三：终端移除隔离属性**
+
+如果是从浏览器下载的 DMG / App，被附加了 quarantine（隔离）属性，可以执行：
 
 ```bash
 xattr -cr /Applications/MagicBattery.app
 ```
+
+如果你还没把 App 拖到 Applications，也可以先对当前路径下的 App 执行同样命令，例如：
+
+```bash
+xattr -cr ~/Downloads/MagicBattery.app
+```
+
+执行后再重新打开应用。
+
+> 说明：这里的 `xattr` 是 macOS 自带命令，用于查看或移除扩展属性；`-c` 表示清除扩展属性，`-r` 表示递归处理整个 `.app` 包。
 
 ## 构建和运行
 
